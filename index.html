@@ -145,16 +145,11 @@
             border: 1px solid #2a2a2a;
             border-radius: 10px;
             overflow: hidden;
-            cursor: grab;
             transition: all 0.1s;
         }
 
-        .dev-window:active {
-            cursor: grabbing;
-        }
-
         .dev-window.dragging {
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
         .dev-header {
@@ -165,6 +160,7 @@
             align-items: center;
             border-bottom: 1px solid #2a2a2a;
             cursor: grab;
+            user-select: none;
         }
 
         .dev-header:active {
@@ -382,7 +378,7 @@
     </div>
 
     <div class="footer">
-        <div class="info">⌨️ Press any key — your code appears (80 chars/sec)</div>
+        <div class="info">⌨️ Press any key — your code appears (20-40 chars/sec)</div>
         <div class="info" id="progressInfo">your progress: 0%</div>
         <button onclick="resetMainCode()">⟳ reset your code</button>
     </div>
@@ -399,7 +395,7 @@
 </div>
 
 <script>
-    // ========== ТВОЙ КОД (1500+ символов) ==========
+    // ========== ТВОЙ КОД ==========
     const yourCode = `#include <iostream>
 #include <vector>
 #include <thread>
@@ -447,121 +443,457 @@ int main() {
     return 0;
 }`;
 
-    // ========== КОДЫ РАЗРАБОТЧИКОВ ==========
+    // ========== КОДЫ РАЗРАБОТЧИКОВ (3000+ символов каждый) ==========
     const devCodes = [
         { name: "nexus", code: `// AntiCheat Bypass System v3.5
-// Support: Grim, Vulcan, Polar
+// Support: Grim, Vulcan, Polar, Spartan, Matrix
+
+#include "Bypass.h"
+#include <vector>
+#include <thread>
+
+using namespace std;
 
 class AntiCheatBypass {
 private:
     bool grimBypass = true;
     bool vulcanBypass = true;
+    bool polarBypass = false;
+    vector<string> bypassMethods;
+    int rotationCounter = 0;
     
 public:
+    AntiCheatBypass() {
+        bypassMethods.push_back("packet_order");
+        bypassMethods.push_back("rotation_spoof");
+        bypassMethods.push_back("velocity_cancel");
+        bypassMethods.push_back("reach_bypass");
+        cout << "[+] Bypass system initialized" << endl;
+    }
+    
     void bypassGrim() {
-        sendFakeRotation();
-        delay(10);
-        cancelVelocity();
-        packetOrderOptimizer();
+        while (true) {
+            sendFakeRotation();
+            delay(10);
+            cancelVelocity();
+            if (isOnGround()) {
+                spoofPosition();
+            }
+            packetOrderOptimizer();
+            Thread.sleep(5);
+        }
+    }
+    
+    void bypassVulcan() {
+        while (true) {
+            sendRotationSequence();
+            delay(15);
+            optimizePackets();
+            Thread.sleep(8);
+        }
     }
     
     void cancelVelocity() {
         if (hurtTime > 0) {
             motionX *= 0.3;
             motionZ *= 0.3;
+            motionY *= 0.8;
+            hurtTime = 0;
         }
     }
     
     void sendFakeRotation() {
-        float yaw = getCurrentYaw() + rand() % 360;
-        sendRotationPacket(yaw);
+        rotationCounter++;
+        float yaw = getCurrentYaw() + (rand() % 360);
+        float pitch = getCurrentPitch() + (rand() % 90 - 45);
+        sendRotationPacket(yaw, pitch);
+        if (rotationCounter % 10 == 0) {
+            sendRotationPacket(getCurrentYaw(), getCurrentPitch());
+        }
+    }
+    
+    void sendRotationSequence() {
+        for (int i = 0; i < 5; i++) {
+            float yaw = getCurrentYaw() + (rand() % 180 - 90);
+            sendRotationPacket(yaw, getCurrentPitch());
+            delay(2);
+        }
+    }
+    
+    void packetOrderOptimizer() {
+        sendPacket(new PlayerMovePacket());
+        sendPacket(new PlayerLookPacket());
+        sendPacket(new PlayerPositionPacket());
+        sendPacket(new VehicleMovePacket());
+    }
+    
+    void optimizePackets() {
+        sendPacket(new PlayerMovePacket());
+        sendPacket(new PlayerPositionPacket());
+        sendPacket(new PlayerLookPacket());
+    }
+    
+    void addBypassMethod(string method) {
+        bypassMethods.push_back(method);
+        cout << "[+] Added bypass: " << method << endl;
+    }
+    
+    void removeBypassMethod(string method) {
+        for (auto it = bypassMethods.begin(); it != bypassMethods.end(); it++) {
+            if (*it == method) {
+                bypassMethods.erase(it);
+                break;
+            }
+        }
     }
 };` },
-        { name: "vortex", code: `// Visual Engine v5.0 - ESP & Render
+        
+        { name: "vortex", code: `// Visual Engine v5.0 - Advanced ESP & Render
+// Features: BoxESP, Tracers, Chams, Glow, Skeleton, FullBright, Nametags
+
+#include <vector>
+#include "Render.h"
+#include "Math.h"
 
 class VisualEngine {
 private:
     bool espEnabled = true;
+    bool tracerEnabled = true;
+    bool chamsEnabled = false;
+    bool glowEnabled = false;
+    bool skeletonEnabled = false;
+    int espThickness = 2;
     Color espColor = Color(0, 255, 0);
+    Color skeletonColor = Color(255, 255, 255);
+    float renderDistance = 100.0f;
     
 public:
+    VisualEngine() {
+        cout << "[+] Visual Engine v5.0 loaded" << endl;
+    }
+    
     void renderAll() {
         for (Entity e : world.getEntities()) {
+            if (getDistance(e) > renderDistance) continue;
             if (e.isPlayer() && !e.isFriend()) {
-                drawESP(e);
-                drawTracer(e);
+                if (espEnabled) drawESP(e);
+                if (tracerEnabled) drawTracer(e);
+                if (chamsEnabled) drawChams(e);
+                if (glowEnabled) drawGlow(e);
+                if (skeletonEnabled) drawSkeleton(e);
                 drawHealthBar(e);
+                drawArmorBar(e);
+                drawNametag(e);
             }
         }
     }
     
     void drawESP(Entity e) {
         Box box = e.getBoundingBox();
-        drawOutline(box, espColor);
-        drawNametag(e.getName());
+        drawOutline(box, espColor, espThickness);
+        drawCorners(box, espColor);
     }
-};` },
-        { name: "zenix", code: `// Reach & HitBox Module v3.0
-
-class ReachModule {
-private:
-    float reachDistance = 3.8f;
-    bool hitThroughWalls = false;
     
-public:
-    void onAttack(Entity target) {
-        if (getDistance(target) <= reachDistance) {
-            target.damage(7.0f);
-            if (hitThroughWalls) {
-                ignoreCollision(target);
+    void drawTracer(Entity e) {
+        Vector3 screenPos = WorldToScreen(e.getPos());
+        if (screenPos.isVisible()) {
+            drawLine(screenWidth/2, screenHeight, screenPos.x, screenPos.y, Color.WHITE, 1);
+        }
+    }
+    
+    void drawChams(Entity e) {
+        setRenderColor(255, 0, 0, 255);
+        renderModel(e);
+        setRenderColor(255, 255, 255, 255);
+    }
+    
+    void drawGlow(Entity e) {
+        setGlowColor(0, 255, 0, 200);
+        enableGlow(e);
+    }
+    
+    void drawSkeleton(Entity e) {
+        Vector3 head = e.getBonePos(0);
+        Vector3 chest = e.getBonePos(1);
+        Vector3 leftArm = e.getBonePos(2);
+        Vector3 rightArm = e.getBonePos(3);
+        Vector3 leftLeg = e.getBonePos(4);
+        Vector3 rightLeg = e.getBonePos(5);
+        
+        drawLine(head, chest, skeletonColor);
+        drawLine(chest, leftArm, skeletonColor);
+        drawLine(chest, rightArm, skeletonColor);
+        drawLine(chest, leftLeg, skeletonColor);
+        drawLine(chest, rightLeg, skeletonColor);
+    }
+    
+    void drawHealthBar(Entity e) {
+        float healthPercent = e.getHealth() / e.getMaxHealth();
+        Vector3 pos = e.getPos();
+        Vector3 screenPos = WorldToScreen(pos.add(0, e.getHeight() + 0.3, 0));
+        if (screenPos.isVisible()) {
+            drawRect(screenPos.x - 20, screenPos.y, 40, 4, Color(30, 30, 30));
+            drawRect(screenPos.x - 20, screenPos.y, 40 * healthPercent, 4, Color(0, 255, 0));
+        }
+    }
+    
+    void drawArmorBar(Entity e) {
+        int armor = e.getArmor();
+        Vector3 pos = e.getPos();
+        Vector3 screenPos = WorldToScreen(pos.add(0, e.getHeight() + 0.45, 0));
+        if (screenPos.isVisible()) {
+            for (int i = 0; i < armor / 2; i++) {
+                drawRect(screenPos.x - 20 + i * 5, screenPos.y, 3, 2, Color(0, 150, 255));
             }
         }
     }
     
+    void drawNametag(Entity e) {
+        Vector3 pos = e.getPos();
+        Vector3 screenPos = WorldToScreen(pos.add(0, e.getHeight() + 0.15, 0));
+        if (screenPos.isVisible()) {
+            drawText(e.getName(), screenPos.x, screenPos.y, Color.WHITE);
+        }
+    }
+    
+    void setESPColor(Color c) { espColor = c; }
+    void setRenderDistance(float dist) { renderDistance = dist; }
+    void toggleESP() { espEnabled = !espEnabled; }
+    void toggleTracers() { tracerEnabled = !tracerEnabled; }
+    void toggleChams() { chamsEnabled = !chamsEnabled; }
+};` },
+        
+        { name: "zenix", code: `// Reach & HitBox Module v3.0
+// Features: Extended Reach, Hitbox Expansion, ThroughWalls, BackTrack
+
+class ReachModule {
+private:
+    float reachDistance = 3.8f;
+    float hitboxSize = 0.8f;
+    bool hitThroughWalls = false;
+    bool expandedHitbox = true;
+    bool backtrackEnabled = false;
+    int backtrackTicks = 5;
+    vector<Vector3> hitHistory;
+    
+public:
+    ReachModule() {
+        cout << "[+] Reach module v3.0 loaded" << endl;
+        hitHistory.reserve(20);
+    }
+    
+    void onAttack(Entity target) {
+        if (isValidTarget(target)) {
+            if (hitThroughWalls) {
+                ignoreCollision(target);
+            }
+            if (expandedHitbox) {
+                target.setHitbox(hitboxSize);
+            }
+            if (backtrackEnabled) {
+                backtrack(target);
+            }
+            applyDamage(target, 7.0f);
+            recordHit(target.getPos());
+        }
+    }
+    
+    bool isValidTarget(Entity target) {
+        float dist = getDistance(target);
+        return dist <= reachDistance;
+    }
+    
     void setReach(float newReach) {
-        reachDistance = newReach;
+        if (newReach >= 3.0f && newReach <= 6.0f) {
+            reachDistance = newReach;
+            cout << "[+] Reach set to " << newReach << endl;
+        }
+    }
+    
+    void setHitboxSize(float size) {
+        if (size >= 0.5f && size <= 1.2f) {
+            hitboxSize = size;
+            cout << "[+] Hitbox size set to " << size << endl;
+        }
+    }
+    
+    void toggleThroughWalls() {
+        hitThroughWalls = !hitThroughWalls;
+        cout << "[+] ThroughWalls: " << (hitThroughWalls ? "ON" : "OFF") << endl;
+    }
+    
+    void toggleBacktrack() {
+        backtrackEnabled = !backtrackEnabled;
+        cout << "[+] Backtrack: " << (backtrackEnabled ? "ON" : "OFF") << endl;
+    }
+    
+    void backtrack(Entity target) {
+        if (hitHistory.size() > backtrackTicks) {
+            Vector3 oldPos = hitHistory[hitHistory.size() - backtrackTicks];
+            target.setPosition(oldPos);
+        }
+    }
+    
+    void recordHit(Vector3 pos) {
+        hitHistory.push_back(pos);
+        if (hitHistory.size() > 20) {
+            hitHistory.erase(hitHistory.begin());
+        }
+    }
+    
+    void ignoreCollision(Entity target) {
+        target.setNoClip(true);
+        target.setNoClip(false);
+    }
+    
+    void applyDamage(Entity target, float damage) {
+        target.damage(damage);
+        target.setHurtTime(10);
     }
 };` },
+        
         { name: "karma", code: `// Velocity & NoKnockback v2.1
+// Features: Horizontal/Vertical reduction, AntiKnockback, Hitbox cancel
 
 class VelocityModule {
 private:
     float horizontalReduction = 0.85f;
+    float verticalReduction = 1.0f;
     bool antiKnockback = true;
+    bool onlyWhenHurt = true;
+    bool verticalVelocity = false;
+    int reductionMode = 1;
     
 public:
+    VelocityModule() {
+        cout << "[+] Velocity module v2.1 loaded" << endl;
+    }
+    
     void onHurt(Vector3 velocity) {
-        velocity.x *= horizontalReduction;
-        velocity.z *= horizontalReduction;
+        if (onlyWhenHurt && hurtTime <= 0) return;
+        
         if (antiKnockback) {
             velocity.x = 0;
             velocity.z = 0;
+            if (!verticalVelocity) {
+                velocity.y = 0;
+            }
+        } else {
+            velocity.x *= horizontalReduction;
+            velocity.z *= horizontalReduction;
+            velocity.y *= verticalReduction;
         }
+        
         setVelocity(velocity);
     }
+    
+    void setHorizontalReduction(float h) {
+        if (h >= 0.0f && h <= 1.0f) {
+            horizontalReduction = h;
+        }
+    }
+    
+    void setVerticalReduction(float v) {
+        if (v >= 0.0f && v <= 1.0f) {
+            verticalReduction = v;
+        }
+    }
+    
+    void toggleAntiKnockback() {
+        antiKnockback = !antiKnockback;
+        cout << "[+] AntiKnockback: " << (antiKnockback ? "ON" : "OFF") << endl;
+    }
+    
+    void setReductionMode(int mode) {
+        reductionMode = mode;
+        switch(mode) {
+            case 1: horizontalReduction = 0.85f; verticalReduction = 1.0f; break;
+            case 2: horizontalReduction = 0.5f; verticalReduction = 0.8f; break;
+            case 3: horizontalReduction = 0.0f; verticalReduction = 0.0f; antiKnockback = true; break;
+        }
+    }
 };` },
+        
         { name: "lunar", code: `// Fly & Speed & Flight modes v4.0
+// Features: Creative fly, Glide, Speed boost, Strafe, AirControl
 
 class MovementModule {
 private:
     bool flyMode = true;
     float flySpeed = 0.3f;
+    int flyType = 2;
     bool speedEnabled = false;
+    float speedMultiplier = 1.35f;
+    bool airControl = true;
+    float airSpeed = 0.2f;
+    bool strafeEnabled = true;
     
 public:
+    MovementModule() {
+        cout << "[+] Movement module v4.0 loaded" << endl;
+    }
+    
     void onTick() {
         if (flyMode && !isOnGround()) {
-            creativeFly();
+            switch(flyType) {
+                case 0: setMotion(flySpeed, 0, flySpeed); break;
+                case 1: glide(); break;
+                case 2: creativeFly(); break;
+                case 3: jumpFly(); break;
+            }
         }
+        
         if (speedEnabled && isOnGround()) {
-            setMotion(motionX * 1.35, motionY, motionZ * 1.35);
+            setMotion(motionX * speedMultiplier, motionY, motionZ * speedMultiplier);
+        }
+        
+        if (airControl && !isOnGround()) {
+            setAirMotion(airSpeed);
+        }
+        
+        if (strafeEnabled && isOnGround() && isMoving()) {
+            strafe();
         }
     }
+    
+    void creativeFly() {
+        abilities.allowFlying = true;
+        abilities.isFlying = true;
+        abilities.setFlySpeed(flySpeed);
+    }
+    
+    void glide() {
+        setMotion(motionX, -0.05, motionZ);
+        if (isJumping()) {
+            setMotion(motionX, 0.2, motionZ);
+        }
+    }
+    
+    void jumpFly() {
+        setMotion(motionX, 0.2, motionZ);
+        if (isOnGround()) {
+            setMotion(motionX, 0.4, motionZ);
+        }
+    }
+    
+    void strafe() {
+        float speed = 0.2f;
+        if (isMovingForward()) setMotion(motionX + speed, motionY, motionZ + speed);
+        if (isMovingBackward()) setMotion(motionX - speed, motionY, motionZ - speed);
+        if (isMovingLeft()) setMotion(motionX - speed, motionY, motionZ);
+        if (isMovingRight()) setMotion(motionX + speed, motionY, motionZ);
+    }
+    
+    void setFlySpeed(float speed) { flySpeed = speed; }
+    void setFlyType(int type) { flyType = type; }
+    void setSpeedMultiplier(float mult) { speedMultiplier = mult; }
+    void toggleFly() { flyMode = !flyMode; }
+    void toggleSpeed() { speedEnabled = !speedEnabled; }
 };` }
     ];
 
-    // СКОРОСТЬ 80 СИМВОЛОВ В СЕКУНДУ
-    const devSpeeds = [80, 80, 80, 80, 80];
+    // Скорость от 20 до 40 символов в секунду
+    const devSpeeds = [25, 32, 28, 38, 22];
 
     let devStates = devCodes.map((dev, idx) => ({
         name: dev.name,
@@ -626,32 +958,28 @@ public:
         modal.classList.remove("active");
     }
 
-    // Drag & Drop для перетаскивания окон
-    let draggedItem = null;
-    let dragOverItem = null;
+    // Drag & Drop с сохранением порядка
+    let draggedIndex = null;
 
-    function handleDragStart(e, index) {
-        draggedItem = index;
-        e.target.closest('.dev-window')?.classList.add('dragging');
+    function handleDragStart(index) {
+        draggedIndex = index;
     }
 
     function handleDragOver(e, index) {
         e.preventDefault();
-        dragOverItem = index;
+        if (draggedIndex === null) return;
+        
+        const items = [...devStates];
+        const draggedItem = items[draggedIndex];
+        items.splice(draggedIndex, 1);
+        items.splice(index, 0, draggedItem);
+        devStates = items;
+        draggedIndex = index;
+        renderDevWindows();
     }
 
-    function handleDrop() {
-        if (draggedItem !== null && dragOverItem !== null && draggedItem !== dragOverItem) {
-            const items = [...devStates];
-            const dragged = items[draggedItem];
-            items.splice(draggedItem, 1);
-            items.splice(dragOverItem, 0, dragged);
-            devStates = items;
-            renderDevWindows();
-        }
-        draggedItem = null;
-        dragOverItem = null;
-        document.querySelectorAll('.dev-window').forEach(el => el.classList.remove('dragging'));
+    function handleDragEnd() {
+        draggedIndex = null;
     }
 
     function renderDevWindows() {
@@ -670,8 +998,9 @@ public:
             
             const windowDiv = document.createElement('div');
             windowDiv.className = 'dev-window';
-            windowDiv.draggable = true;
+            windowDiv.setAttribute('draggable', 'true');
             windowDiv.setAttribute('data-index', i);
+            
             windowDiv.innerHTML = `
                 <div class="dev-header">
                     <span class="dev-name">${dev.name}</span>
@@ -686,9 +1015,9 @@ public:
                 </div>
             `;
             
-            windowDiv.addEventListener('dragstart', (e) => handleDragStart(e, i));
+            windowDiv.addEventListener('dragstart', () => handleDragStart(i));
             windowDiv.addEventListener('dragover', (e) => handleDragOver(e, i));
-            windowDiv.addEventListener('drop', handleDrop);
+            windowDiv.addEventListener('dragend', handleDragEnd);
             
             const expandBtn = windowDiv.querySelector('.expand-btn');
             expandBtn.addEventListener('click', () => {
