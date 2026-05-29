@@ -134,7 +134,7 @@
 
         .side-panel {
             flex: 1.2;
-            min-width: 280px;
+            min-width: 300px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -145,6 +145,16 @@
             border: 1px solid #2a2a2a;
             border-radius: 10px;
             overflow: hidden;
+            cursor: grab;
+            transition: all 0.1s;
+        }
+
+        .dev-window:active {
+            cursor: grabbing;
+        }
+
+        .dev-window.dragging {
+            opacity: 0.5;
         }
 
         .dev-header {
@@ -154,12 +164,23 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #2a2a2a;
+            cursor: grab;
+        }
+
+        .dev-header:active {
+            cursor: grabbing;
         }
 
         .dev-name {
             font-size: 11px;
             font-weight: 600;
             color: #e8e8e8;
+        }
+
+        .dev-controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
         }
 
         .dev-status {
@@ -170,13 +191,30 @@
             color: #4ec9b0;
         }
 
+        .expand-btn {
+            background: #1e1e1e;
+            border: 1px solid #3a3a3a;
+            color: #aaa;
+            padding: 2px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 10px;
+            transition: all 0.2s;
+        }
+
+        .expand-btn:hover {
+            background: #2a2a2a;
+            border-color: #4ec9b0;
+            color: #4ec9b0;
+        }
+
         .dev-code {
             padding: 10px 12px;
             font-family: 'Courier New', monospace;
-            font-size: 9px;
+            font-size: 10px;
             color: #aaa;
             line-height: 1.5;
-            max-height: 100px;
+            max-height: 120px;
             overflow-y: auto;
             background: #0a0a0a;
         }
@@ -190,7 +228,7 @@
             height: 100%;
             width: 0%;
             background: #4ec9b0;
-            transition: width 0.1s linear;
+            transition: width 0.02s linear;
         }
 
         .footer {
@@ -226,16 +264,91 @@
             color: #4ec9b0;
         }
 
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+            z-index: 1000;
+            padding: 40px;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            width: 90%;
+            height: 85%;
+            background: #0d0d0d;
+            border: 1px solid #4ec9b0;
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: #141414;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .modal-title {
+            color: #4ec9b0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            color: #aaa;
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .close-modal:hover {
+            background: #2a2a2a;
+            border-color: #ff5555;
+            color: #ff5555;
+        }
+
+        .modal-code {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #d4d4d4;
+            white-space: pre-wrap;
+            background: #0a0a0a;
+        }
+
         ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
         }
         ::-webkit-scrollbar-track {
             background: #1a1a1a;
         }
         ::-webkit-scrollbar-thumb {
             background: #3a3a3a;
-            border-radius: 3px;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4ec9b0;
         }
     </style>
 </head>
@@ -269,16 +382,28 @@
     </div>
 
     <div class="footer">
-        <div class="info">⌨️ Press any key — your code appears</div>
+        <div class="info">⌨️ Press any key — your code appears (80 chars/sec)</div>
         <div class="info" id="progressInfo">your progress: 0%</div>
         <button onclick="resetMainCode()">⟳ reset your code</button>
     </div>
 </div>
 
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-title" id="modalTitle">Developer</span>
+            <button class="close-modal" onclick="closeModal()">✕ Close</button>
+        </div>
+        <div class="modal-code" id="modalCode"></div>
+    </div>
+</div>
+
 <script>
-    // ========== ТВОЙ КОД ==========
+    // ========== ТВОЙ КОД (1500+ символов) ==========
     const yourCode = `#include <iostream>
 #include <vector>
+#include <thread>
+#include <chrono>
 #include "MinecraftCheat.h"
 
 using namespace std;
@@ -292,11 +417,8 @@ private:
 public:
     void update() {
         Entity target = getNearestEntity();
-        if (target.isValid() && distance(target) <= range) {
+        if (target.isValid() && getDistance(target) <= range) {
             attack(target);
-            if (silent) {
-                rotateCamera(target);
-            }
         }
     }
     
@@ -320,121 +442,126 @@ int main() {
     KillAura aura;
     while (true) {
         aura.update();
-        Sleep(1000 / 20);
+        this_thread::sleep_for(chrono::milliseconds(50));
     }
     return 0;
 }`;
 
-    // ========== ДЛИННЫЕ КОДЫ ДЛЯ 5 РАЗРАБОТЧИКОВ (по 300-500 символов) ==========
+    // ========== КОДЫ РАЗРАБОТЧИКОВ ==========
     const devCodes = [
-        { name: "nexus", code: `// AntiCheat Bypass v2.3 - Grim / Vulcan bypass
-#include "Bypass.h"
+        { name: "nexus", code: `// AntiCheat Bypass System v3.5
+// Support: Grim, Vulcan, Polar
 
-void bypassGrim() {
-    while (true) {
+class AntiCheatBypass {
+private:
+    bool grimBypass = true;
+    bool vulcanBypass = true;
+    
+public:
+    void bypassGrim() {
         sendFakeRotation();
         delay(10);
         cancelVelocity();
-        if (isOnGround()) {
-            spoofPosition();
-        }
         packetOrderOptimizer();
-        Thread.sleep(5);
     }
-}
+    
+    void cancelVelocity() {
+        if (hurtTime > 0) {
+            motionX *= 0.3;
+            motionZ *= 0.3;
+        }
+    }
+    
+    void sendFakeRotation() {
+        float yaw = getCurrentYaw() + rand() % 360;
+        sendRotationPacket(yaw);
+    }
+};` },
+        { name: "vortex", code: `// Visual Engine v5.0 - ESP & Render
 
-void cancelVelocity() {
-    if (hurtTime > 0) {
-        motionX *= 0.3;
-        motionZ *= 0.3;
+class VisualEngine {
+private:
+    bool espEnabled = true;
+    Color espColor = Color(0, 255, 0);
+    
+public:
+    void renderAll() {
+        for (Entity e : world.getEntities()) {
+            if (e.isPlayer() && !e.isFriend()) {
+                drawESP(e);
+                drawTracer(e);
+                drawHealthBar(e);
+            }
+        }
     }
-}` },
-        { name: "vortex", code: `// Visual Engine v4.2 - ESP / Tracers / Chams
-class Renderer {
+    
     void drawESP(Entity e) {
         Box box = e.getBoundingBox();
-        drawOutline(box, Color(0,255,0));
+        drawOutline(box, espColor);
         drawNametag(e.getName());
-        drawHealthBar(e.getHealth());
-        drawArmorBar(e.getArmor());
-        if (e.isTarget()) {
-            drawGlow(e, Color.RED);
-        }
     }
-    
-    void drawTracers(Entity e) {
-        Vector3 screenPos = WorldToScreen(e.getPos());
-        drawLine(screenWidth/2, screenHeight, screenPos.x, screenPos.y, Color.WHITE);
-    }
-    
-    void fullBright() {
-        gamma = 100.0f;
-    }
-}` },
+};` },
         { name: "zenix", code: `// Reach & HitBox Module v3.0
-float reachDistance = 3.8f;
-bool hitThroughWalls = false;
-bool expandedHitbox = true;
 
-void onAttack(Entity target) {
-    if (getDistance(target) <= reachDistance) {
-        target.damage(7.0f);
-        if (hitThroughWalls) {
-            ignoreCollision(target);
-        }
-        if (expandedHitbox) {
-            target.setHitbox(0.8f);
+class ReachModule {
+private:
+    float reachDistance = 3.8f;
+    bool hitThroughWalls = false;
+    
+public:
+    void onAttack(Entity target) {
+        if (getDistance(target) <= reachDistance) {
+            target.damage(7.0f);
+            if (hitThroughWalls) {
+                ignoreCollision(target);
+            }
         }
     }
-}
-
-void setReach(float newReach) {
-    reachDistance = newReach;
-    cout << "Reach set to " << newReach << endl;
-}` },
+    
+    void setReach(float newReach) {
+        reachDistance = newReach;
+    }
+};` },
         { name: "karma", code: `// Velocity & NoKnockback v2.1
-void onHurt(Vector3 velocity) {
-    float reduction = 0.85f;
-    velocity.x *= reduction;
-    velocity.z *= reduction;
-    if (isInAir()) {
-        velocity.y *= 0.9f;
-    }
-    setVelocity(velocity);
-}
 
-void noKnockback() {
-    if (hurtTime > 0) {
-        motionX = 0;
-        motionZ = 0;
-        hurttime = 0;
+class VelocityModule {
+private:
+    float horizontalReduction = 0.85f;
+    bool antiKnockback = true;
+    
+public:
+    void onHurt(Vector3 velocity) {
+        velocity.x *= horizontalReduction;
+        velocity.z *= horizontalReduction;
+        if (antiKnockback) {
+            velocity.x = 0;
+            velocity.z = 0;
+        }
+        setVelocity(velocity);
     }
-}
+};` },
+        { name: "lunar", code: `// Fly & Speed & Flight modes v4.0
 
-void velocityReduction(float percent) {
-    reduction = percent / 100.0f;
-}` },
-        { name: "lunar", code: `// Fly & Speed & Flight modes
-bool flyMode = true;
-float flySpeed = 0.3f;
-int flyType = 2; // 0=vanilla, 1=glide, 2=creative
-
-void onTick() {
-    if (flyMode && !isOnGround()) {
-        if (flyType == 0) setMotion(flySpeed, 0, flySpeed);
-        if (flyType == 1) glide();
-        if (flyType == 2) creativeFly();
-    }
-    if (speedEnabled) {
-        if (isOnGround()) {
+class MovementModule {
+private:
+    bool flyMode = true;
+    float flySpeed = 0.3f;
+    bool speedEnabled = false;
+    
+public:
+    void onTick() {
+        if (flyMode && !isOnGround()) {
+            creativeFly();
+        }
+        if (speedEnabled && isOnGround()) {
             setMotion(motionX * 1.35, motionY, motionZ * 1.35);
         }
     }
-}` }
+};` }
     ];
 
-    // Скорости от 25 до 50 символов в секунду (быстро и заметно)
-    const devSpeeds = [28, 42, 35, 48, 30];
+    // СКОРОСТЬ 80 СИМВОЛОВ В СЕКУНДУ
+    const devSpeeds = [80, 80, 80, 80, 80];
 
     let devStates = devCodes.map((dev, idx) => ({
         name: dev.name,
@@ -484,6 +611,49 @@ void onTick() {
         }
     }
 
+    function openModal(devName, fullCodeText) {
+        const modal = document.getElementById("modal");
+        const modalTitle = document.getElementById("modalTitle");
+        const modalCode = document.getElementById("modalCode");
+        
+        modalTitle.innerText = devName + " · fullscreen code";
+        modalCode.innerText = fullCodeText;
+        modal.classList.add("active");
+    }
+
+    function closeModal() {
+        const modal = document.getElementById("modal");
+        modal.classList.remove("active");
+    }
+
+    // Drag & Drop для перетаскивания окон
+    let draggedItem = null;
+    let dragOverItem = null;
+
+    function handleDragStart(e, index) {
+        draggedItem = index;
+        e.target.closest('.dev-window')?.classList.add('dragging');
+    }
+
+    function handleDragOver(e, index) {
+        e.preventDefault();
+        dragOverItem = index;
+    }
+
+    function handleDrop() {
+        if (draggedItem !== null && dragOverItem !== null && draggedItem !== dragOverItem) {
+            const items = [...devStates];
+            const dragged = items[draggedItem];
+            items.splice(draggedItem, 1);
+            items.splice(dragOverItem, 0, dragged);
+            devStates = items;
+            renderDevWindows();
+        }
+        draggedItem = null;
+        dragOverItem = null;
+        document.querySelectorAll('.dev-window').forEach(el => el.classList.remove('dragging'));
+    }
+
     function renderDevWindows() {
         sidePanel.innerHTML = "";
         for (let i = 0; i < devStates.length; i++) {
@@ -491,8 +661,8 @@ void onTick() {
             const percent = Math.floor((dev.currentIndex / dev.totalChars) * 100);
             
             let codePreview = dev.displayText;
-            if (codePreview.length > 120) {
-                codePreview = codePreview.substring(0, 117) + "...";
+            if (codePreview.length > 150) {
+                codePreview = codePreview.substring(0, 147) + "...";
             }
             let escapedCode = codePreview.replace(/&/g, '&amp;')
                                          .replace(/</g, '&lt;')
@@ -500,16 +670,31 @@ void onTick() {
             
             const windowDiv = document.createElement('div');
             windowDiv.className = 'dev-window';
+            windowDiv.draggable = true;
+            windowDiv.setAttribute('data-index', i);
             windowDiv.innerHTML = `
                 <div class="dev-header">
                     <span class="dev-name">${dev.name}</span>
-                    <span class="dev-status">${percent}%</span>
+                    <div class="dev-controls">
+                        <span class="dev-status">${percent}%</span>
+                        <button class="expand-btn" data-name="${dev.name}" data-code="${dev.fullCode.replace(/"/g, '&quot;').replace(/\n/g, '\\n')}">⤢</button>
+                    </div>
                 </div>
                 <div class="dev-code">${escapedCode}</div>
                 <div class="dev-progress">
                     <div class="dev-progress-fill" style="width: ${percent}%"></div>
                 </div>
             `;
+            
+            windowDiv.addEventListener('dragstart', (e) => handleDragStart(e, i));
+            windowDiv.addEventListener('dragover', (e) => handleDragOver(e, i));
+            windowDiv.addEventListener('drop', handleDrop);
+            
+            const expandBtn = windowDiv.querySelector('.expand-btn');
+            expandBtn.addEventListener('click', () => {
+                openModal(expandBtn.dataset.name, dev.fullCode);
+            });
+            
             sidePanel.appendChild(windowDiv);
         }
     }
@@ -563,6 +748,9 @@ void onTick() {
     renderDevWindows();
     document.addEventListener("keydown", onKeyPress);
     requestAnimationFrame(animateDevs);
+    
+    window.openModal = openModal;
+    window.closeModal = closeModal;
 </script>
 </body>
 </html>
