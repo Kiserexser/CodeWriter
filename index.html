@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C++ Code Writer | Live Demo</title>
+    <title>GameEngine.cpp - Visual Studio Code</title>
     <style>
         * {
             margin: 0;
@@ -13,7 +13,7 @@
         
         body {
             background: #0a0a0a;
-            font-family: 'Courier New', monospace;
+            font-family: 'Consolas', 'Courier New', 'Fira Code', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -21,68 +21,129 @@
             padding: 20px;
         }
         
-        .container {
+        .vscode {
             background: #1e1e1e;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            width: 1000px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
+            width: 1200px;
             max-width: 100%;
-            border: 1px solid #333;
+            border: 1px solid #2d2d2d;
         }
         
-        .header {
+        .title-bar {
             background: #2d2d2d;
             padding: 10px 16px;
             display: flex;
-            gap: 10px;
-            border-bottom: 1px solid #444;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid #3e3e3e;
         }
         
-        .window-dot {
+        .window-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .window-btn {
             width: 12px;
             height: 12px;
             border-radius: 50%;
+            transition: opacity 0.2s;
         }
         
-        .dot-red { background: #ff5f56; }
-        .dot-yellow { background: #ffbd2e; }
-        .dot-green { background: #27c93f; }
+        .window-btn:hover { opacity: 0.8; }
+        .close { background: #ff5f56; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #27c93f; }
         
-        .title {
-            color: #aaa;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        
-        .editor {
+        .file-tabs {
             display: flex;
-            min-height: 500px;
+            gap: 4px;
+            margin-left: 20px;
+        }
+        
+        .tab {
+            background: #2d2d2d;
+            padding: 4px 16px;
+            font-size: 12px;
+            color: #ccc;
+            border-radius: 6px 6px 0 0;
+            cursor: default;
+        }
+        
+        .tab.active {
+            background: #1e1e1e;
+            color: white;
+        }
+        
+        .git-branch {
+            margin-left: auto;
+            font-size: 11px;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .main-content {
+            display: flex;
+            min-height: 550px;
+        }
+        
+        .sidebar {
+            width: 48px;
+            background: #252526;
+            border-right: 1px solid #3e3e3e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 12px;
+            gap: 20px;
+        }
+        
+        .sidebar-icon {
+            font-size: 20px;
+            opacity: 0.6;
+            cursor: default;
+        }
+        
+        .sidebar-icon.active {
+            opacity: 1;
+            border-left: 2px solid #007acc;
+            padding-left: 6px;
+        }
+        
+        .editor-area {
+            flex: 1;
+            display: flex;
         }
         
         .line-numbers {
             background: #1e1e1e;
             color: #6e6e6e;
-            padding: 16px 10px;
+            padding: 16px 12px;
             text-align: right;
             font-size: 13px;
             line-height: 1.5;
             user-select: none;
             border-right: 1px solid #2d2d2d;
+            font-family: monospace;
         }
         
-        .code-area {
+        .code-container {
             flex: 1;
             background: #1e1e1e;
             padding: 16px;
             overflow-y: auto;
+            position: relative;
         }
         
         #codeDisplay {
             color: #d4d4d4;
             font-size: 13px;
             line-height: 1.5;
-            font-family: 'Courier New', monospace;
+            font-family: 'Consolas', 'Courier New', monospace;
             white-space: pre-wrap;
             word-break: break-all;
         }
@@ -102,77 +163,131 @@
             51%, 100% { opacity: 0; }
         }
         
-        .status {
+        .status-bar {
             background: #007acc;
             padding: 6px 16px;
             display: flex;
             justify-content: space-between;
             color: white;
             font-size: 11px;
+            font-family: monospace;
+        }
+        
+        .status-left, .status-right {
+            display: flex;
+            gap: 16px;
         }
         
         .footer {
             background: #2d2d2d;
             padding: 8px 16px;
-            color: #888;
-            font-size: 11px;
             display: flex;
             justify-content: space-between;
-            border-top: 1px solid #444;
+            align-items: center;
+            font-size: 11px;
+            color: #888;
+            border-top: 1px solid #3e3e3e;
         }
         
-        button {
+        .btn-reset {
             background: #0e639c;
             border: none;
             color: white;
-            padding: 4px 12px;
+            padding: 4px 14px;
             border-radius: 4px;
             cursor: pointer;
             font-family: monospace;
+            font-size: 11px;
+            transition: background 0.2s;
         }
         
-        button:hover {
+        .btn-reset:hover {
             background: #1177bb;
         }
         
-        .progress {
+        .progress-text {
             color: #4ec9b0;
+            font-weight: bold;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #3e3e3e;
+            border-radius: 5px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4e4e4e;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <div class="window-dot dot-red"></div>
-        <div class="window-dot dot-yellow"></div>
-        <div class="window-dot dot-green"></div>
-        <div class="title">main.cpp - Visual Studio Code (C++20)</div>
-    </div>
-    
-    <div class="editor">
-        <div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20</div>
-        <div class="code-area">
-            <div id="codeDisplay"></div>
-            <span class="cursor"></span>
+<div class="vscode">
+    <div class="title-bar">
+        <div class="window-controls">
+            <div class="window-btn close"></div>
+            <div class="window-btn minimize"></div>
+            <div class="window-btn maximize"></div>
+        </div>
+        <div class="file-tabs">
+            <div class="tab active">📄 main.cpp</div>
+            <div class="tab">🔧 shader.glsl</div>
+            <div class="tab">⚙️ CMakeLists.txt</div>
+        </div>
+        <div class="git-branch">
+            🔀 main
+            <span>●</span>
         </div>
     </div>
     
-    <div class="status">
-        <span>📁 GameEngine / main.cpp</span>
-        <span>⚡ Type ANY key</span>
-        <span>🖥️ C++20</span>
+    <div class="main-content">
+        <div class="sidebar">
+            <div class="sidebar-icon active">📁</div>
+            <div class="sidebar-icon">🔍</div>
+            <div class="sidebar-icon">🔀</div>
+            <div class="sidebar-icon">🐞</div>
+            <div class="sidebar-icon">📦</div>
+        </div>
+        
+        <div class="editor-area">
+            <div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25</div>
+            <div class="code-container">
+                <div id="codeDisplay"></div>
+                <span class="cursor"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div class="status-bar">
+        <div class="status-left">
+            <span>📁 GameEngine</span>
+            <span>🖥️ C++20</span>
+            <span>🔨 x64 Debug</span>
+        </div>
+        <div class="status-right">
+            <span>💻 0 errors</span>
+            <span>⚠️ 0 warnings</span>
+            <span>🎯 Ready</span>
+        </div>
     </div>
     
     <div class="footer">
-        <span>🔑 Нажми любую клавишу → появляется символ</span>
-        <span class="progress" id="progressText">0%</span>
-        <button onclick="resetCode()">⟳ Очистить</button>
+        <span>🔑 Press ANY key to start typing — code appears automatically</span>
+        <span class="progress-text" id="progressText">0%</span>
+        <button class="btn-reset" onclick="resetCode()">⟳ Reset</button>
     </div>
 </div>
 
 <script>
-    // ========== 1200 символов C++ кода ==========
     const fullCode = `#include <iostream>
 #include <vector>
 #include <memory>
@@ -431,7 +546,7 @@ struct Renderable : Component {
     bool visible;
 };
 
-// ========== RENDER PIPELINE ==========
+// ========== SHADER SYSTEM ==========
 
 class Shader {
 private:
@@ -444,14 +559,22 @@ public:
         : vertexSource(vs), fragmentSource(fs), programID(0) {}
     
     bool compile() {
-        // Compilation logic here
+        // Vertex shader compilation
+        // Fragment shader compilation
+        // Link program
         return true;
     }
     
     void bind() {
-        // Bind shader
+        // glUseProgram(programID);
+    }
+    
+    void setUniform(const string& name, float value) {
+        // glUniform1f(location, value);
     }
 };
+
+// ========== TEXTURE SYSTEM ==========
 
 class Texture {
 private:
@@ -461,7 +584,8 @@ private:
     
 public:
     Texture(const string& path) {
-        // Load texture
+        // Load image using stb_image
+        // Generate OpenGL texture
     }
     
     ~Texture() {
@@ -469,9 +593,12 @@ public:
     }
     
     void bind(uint32_t slot = 0) {
-        // Bind texture
+        // glActiveTexture(GL_TEXTURE0 + slot);
+        // glBindTexture(GL_TEXTURE_2D, textureID);
     }
 };
+
+// ========== MESH SYSTEM ==========
 
 class Mesh {
 private:
@@ -483,14 +610,17 @@ private:
     
 public:
     Mesh(const vector<Vec3f>& verts, const vector<uint32_t>& inds)
-        : vertices(verts), indices(inds) {}
+        : vertices(verts), indices(inds) {
+        upload();
+    }
     
     void upload() {
+        // Generate buffers
         // Upload to GPU
     }
     
     void draw() {
-        // Draw call
+        // glDrawElements
     }
 };
 
@@ -509,7 +639,7 @@ private:
 public:
     GameEngine() : running(false), deltaTime(0), nextEntityID(0) {
         memoryPool = make_unique<MemoryPool>();
-        cout << "GameEngine initialized" << endl;
+        cout << "[Engine] Initialized" << endl;
     }
     
     ~GameEngine() {
@@ -544,14 +674,14 @@ public:
         deltaTime = chrono::duration<float>(now - lastFrame).count();
         lastFrame = now;
         
-        // Update entities
+        // Update all entities
         for (auto entity : entities) {
-            // Update logic here
+            // Process components
         }
     }
     
     void render() {
-        // Render logic here
+        // Render all renderable entities
     }
     
     void run() {
@@ -560,7 +690,7 @@ public:
         while (running) {
             update();
             render();
-            this_thread::sleep_for(chrono::milliseconds(16));
+            this_thread::sleep_for(chrono::milliseconds(16)); // 60 FPS
         }
         
         shutdown();
@@ -574,8 +704,11 @@ public:
 // ========== MAIN ENTRY POINT ==========
 
 int main() {
+    cout << "Starting Game Engine..." << endl;
+    
     auto engine = make_unique<GameEngine::GameEngine>();
     engine->run();
+    
     return 0;
 }`;
 
@@ -588,14 +721,21 @@ int main() {
     const maxChars = fullCode.length;
     
     function updateDisplay() {
-        // Обновляем текст
-        codeDisplay.innerHTML = displayText.replace(/ /g, "&nbsp;").replace(/\\n/g, "<br>");
+        // Экранируем HTML
+        let escaped = displayText.replace(/&/g, '&amp;')
+                                 .replace(/</g, '&lt;')
+                                 .replace(/>/g, '&gt;');
+        
+        // Сохраняем пробелы
+        escaped = escaped.replace(/ /g, '&nbsp;');
+        
+        codeDisplay.innerHTML = escaped;
         
         // Обновляем номера строк
-        const lines = displayText.split('\\n');
+        const lines = displayText.split('\n');
         const lineCount = lines.length;
         let lineNumbersHtml = "";
-        for (let i = 1; i <= Math.max(lineCount, 20); i++) {
+        for (let i = 1; i <= Math.max(lineCount, 25); i++) {
             lineNumbersHtml += i + "<br>";
         }
         lineNumbersDiv.innerHTML = lineNumbersHtml;
@@ -604,9 +744,9 @@ int main() {
         const percent = Math.floor((currentIndex / maxChars) * 100);
         progressText.innerText = percent + "%";
         
-        // Прокрутка вниз
-        const codeArea = document.querySelector(".code-area");
-        codeArea.scrollTop = codeArea.scrollHeight;
+        // Автопрокрутка
+        const container = document.querySelector(".code-container");
+        container.scrollTop = container.scrollHeight;
     }
     
     function addCharacter() {
@@ -622,13 +762,13 @@ int main() {
     }
     
     function onKeyPress(e) {
-        // Игнорируем специальные клавиши
+        // Игнорируем модификаторы
         if (e.key === "Control" || e.key === "Alt" || e.key === "Shift" || 
             e.key === "Meta" || e.key === "Escape" || e.key === "Tab" ||
             e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" ||
             e.key === "Pause" || e.key === "Insert" || e.key === "Home" ||
             e.key === "PageUp" || e.key === "Delete" || e.key === "End" ||
-            e.key === "PageDown") {
+            e.key === "PageDown")) {
             return;
         }
         
@@ -642,7 +782,7 @@ int main() {
         document.addEventListener("keydown", onKeyPress);
     }
     
-    // Запускаем
+    // Запуск
     updateDisplay();
     document.addEventListener("keydown", onKeyPress);
 </script>
