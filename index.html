@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lunxes Studio | Live Code</title>
+    <title>ModCodX | Minecraft Cheat Studio</title>
     <style>
         * {
             margin: 0;
@@ -12,130 +12,111 @@
         }
 
         body {
-            background: #0a0a0f;
-            font-family: 'Inter', 'Segoe UI', monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: #0a0a0a;
+            font-family: 'Consolas', 'Courier New', monospace;
+            padding: 20px;
             min-height: 100vh;
-            padding: 2rem;
-        }
-
-        /* Анимация градиента */
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
 
         .container {
-            max-width: 1300px;
-            width: 100%;
-            background: rgba(8, 8, 14, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 32px;
-            border: 1px solid rgba(0, 255, 255, 0.2);
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8), 0 0 30px rgba(0, 200, 255, 0.05);
-            overflow: hidden;
-            transition: all 0.3s ease;
+            max-width: 1600px;
+            margin: 0 auto;
         }
 
         /* Хедер */
         .header {
-            padding: 1.5rem 2rem;
-            background: rgba(10, 10, 18, 0.8);
-            border-bottom: 1px solid rgba(0, 255, 255, 0.15);
+            margin-bottom: 24px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: baseline;
             flex-wrap: wrap;
-            gap: 1rem;
+            gap: 15px;
+            border-bottom: 1px solid #2a2a2a;
+            padding-bottom: 12px;
         }
 
         .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            font-size: 32px;
-            filter: drop-shadow(0 0 8px cyan);
-        }
-
-        .logo-text {
-            font-size: 24px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #fff, #00ffff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            letter-spacing: -0.5px;
-        }
-
-        .badge {
-            background: rgba(0, 255, 255, 0.1);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 13px;
-            color: #0ff;
-            font-weight: 500;
-        }
-
-        /* Статистика */
-        .stats {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
             font-size: 28px;
             font-weight: 700;
             color: #fff;
-            text-shadow: 0 0 10px cyan;
+            letter-spacing: -1px;
         }
 
-        .stat-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #6b7280;
+        .logo span {
+            color: #4ec9b0;
         }
 
-        /* Основной редактор */
-        .editor {
+        .sub {
+            color: #555;
+            font-size: 12px;
+        }
+
+        /* Основная сетка */
+        .workspace {
             display: flex;
-            background: #0a0a0f;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Главный редактор (слева) */
+        .main-editor {
+            flex: 3;
+            min-width: 400px;
+            background: #0d0d0d;
+            border: 1px solid #2a2a2a;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .editor-header {
+            background: #141414;
+            padding: 12px 16px;
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-title {
+            color: #4ec9b0;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .editor-badge {
+            background: #1e1e1e;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            color: #888;
+        }
+
+        .code-panel {
+            display: flex;
+            min-height: 550px;
         }
 
         .line-numbers {
-            padding: 2rem 1rem;
+            padding: 20px 12px;
             text-align: right;
-            color: #3f3f4a;
-            font-family: 'Fira Code', monospace;
-            font-size: 13px;
+            color: #3a3a3a;
+            font-size: 12px;
             line-height: 1.6;
-            border-right: 1px solid rgba(0, 255, 255, 0.1);
-            background: #050508;
+            border-right: 1px solid #222;
+            background: #0d0d0d;
         }
 
         .code-area {
             flex: 1;
-            padding: 2rem;
-            position: relative;
-            background: #0a0a0f;
+            padding: 20px;
+            background: #0d0d0d;
+            overflow-y: auto;
         }
 
         #codeDisplay {
-            font-family: 'Fira Code', 'Courier New', monospace;
-            font-size: 14px;
+            color: #d4d4d4;
+            font-size: 12px;
             line-height: 1.6;
-            color: #e2e8f0;
             white-space: pre-wrap;
             word-break: break-word;
         }
@@ -143,12 +124,10 @@
         .cursor {
             display: inline-block;
             width: 2px;
-            height: 18px;
-            background: #0ff;
+            height: 14px;
+            background: #aaa;
             animation: blink 1s infinite;
             vertical-align: middle;
-            margin-left: 2px;
-            box-shadow: 0 0 5px cyan;
         }
 
         @keyframes blink {
@@ -156,79 +135,113 @@
             51%, 100% { opacity: 0; }
         }
 
+        /* Боковая панель с 5 окнами */
+        .side-panel {
+            flex: 1.2;
+            min-width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .dev-window {
+            background: #0d0d0d;
+            border: 1px solid #2a2a2a;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .dev-header {
+            background: #141414;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .dev-name {
+            font-size: 11px;
+            font-weight: 600;
+            color: #e8e8e8;
+        }
+
+        .dev-status {
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 20px;
+            background: #1a3a1a;
+            color: #4ec9b0;
+        }
+
+        .dev-code {
+            padding: 10px 12px;
+            font-family: 'Courier New', monospace;
+            font-size: 9px;
+            color: #aaa;
+            line-height: 1.5;
+            max-height: 100px;
+            overflow-y: auto;
+            background: #0a0a0a;
+        }
+
+        .dev-progress {
+            height: 2px;
+            background: #222;
+        }
+
+        .dev-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: #4ec9b0;
+            transition: width 0.1s linear;
+        }
+
         /* Футер */
         .footer {
-            padding: 1rem 2rem;
-            background: rgba(5, 5, 10, 0.9);
-            border-top: 1px solid rgba(0, 255, 255, 0.1);
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #2a2a2a;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .progress-bar {
-            flex: 1;
-            height: 4px;
-            background: #1f1f2a;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #0ff, #00aaff);
-            border-radius: 10px;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 10px cyan;
-        }
-
-        button {
-            background: rgba(0, 255, 255, 0.1);
-            border: 1px solid rgba(0, 255, 255, 0.4);
-            padding: 8px 20px;
-            border-radius: 40px;
-            color: #0ff;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-
-        button:hover {
-            background: rgba(0, 255, 255, 0.2);
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
-            border-color: cyan;
+            gap: 15px;
         }
 
         .info {
-            display: flex;
-            gap: 1.5rem;
-            font-size: 12px;
-            color: #6b7280;
+            color: #555;
+            font-size: 11px;
         }
 
-        .info span {
-            color: #0ff;
+        button {
+            background: #1a1a1a;
+            border: 1px solid #3a3a3a;
+            padding: 6px 18px;
+            color: #ddd;
+            font-family: monospace;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s;
         }
 
-        @media (max-width: 768px) {
-            .header, .footer {
-                flex-direction: column;
-                text-align: center;
-            }
-            .stats {
-                justify-content: center;
-            }
-            .line-numbers {
-                padding: 1rem 0.5rem;
-                font-size: 10px;
-            }
-            .code-area {
-                padding: 1rem;
-            }
+        button:hover {
+            background: #252525;
+            border-color: #4ec9b0;
+            color: #4ec9b0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a3a3a;
+            border-radius: 3px;
         }
     </style>
 </head>
@@ -236,361 +249,283 @@
 
 <div class="container">
     <div class="header">
-        <div class="logo">
-            <div class="logo-icon">✦</div>
-            <div class="logo-text">Lunxes Studio</div>
-            <div class="badge">live coding</div>
+        <div>
+            <div class="logo">Mod<span>Cod</span>X</div>
+            <div class="sub">Minecraft Cheat Development Studio</div>
         </div>
-        <div class="stats">
-            <div class="stat-item">
-                <div class="stat-value" id="charCount">0</div>
-                <div class="stat-label">symbols</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="lineCount">0</div>
-                <div class="stat-label">lines</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="progressPercent">0%</div>
-                <div class="stat-label">completed</div>
-            </div>
-        </div>
+        <div class="info">⚡ collaborative coding · 6 developers online</div>
     </div>
 
-    <div class="editor">
-        <div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25</div>
-        <div class="code-area">
-            <div id="codeDisplay"></div>
-            <span class="cursor"></span>
+    <div class="workspace">
+        <!-- Главный редактор -->
+        <div class="main-editor">
+            <div class="editor-header">
+                <div class="editor-title">📁 YOU · main.cpp</div>
+                <div class="editor-badge">lead developer</div>
+            </div>
+            <div class="code-panel">
+                <div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20</div>
+                <div class="code-area">
+                    <div id="codeDisplay"></div>
+                    <span class="cursor"></span>
+                </div>
+            </div>
         </div>
+
+        <!-- 5 окон других разработчиков -->
+        <div class="side-panel" id="sidePanel"></div>
     </div>
 
     <div class="footer">
-        <div class="info">
-            <span>⚡</span> type any key
-        </div>
-        <div class="progress-bar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-        <button onclick="resetCode()">⟳ reset</button>
+        <div class="info">⌨️ Press any key — your code appears</div>
+        <div class="info" id="progressInfo">your progress: 0%</div>
+        <button onclick="resetMainCode()">⟳ reset your code</button>
     </div>
 </div>
 
 <script>
-    // Длинный C++ код (настоящий, 2500+ символов)
-    const fullCode = `#include <iostream>
+    // ========== ТВОЙ КОД (основной) ==========
+    const yourCode = `#include <iostream>
 #include <vector>
-#include <memory>
-#include <thread>
-#include <chrono>
-#include <mutex>
-#include <functional>
-#include <algorithm>
-#include <cmath>
+#include "MinecraftCheat.h"
 
 using namespace std;
 
-namespace engine {
-
-// ========== MATH CORE ==========
-
-template<typename T>
-class Vector3 {
-public:
-    T x, y, z;
-    
-    Vector3() : x(0), y(0), z(0) {}
-    Vector3(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {}
-    
-    Vector3 operator+(const Vector3& v) const {
-        return Vector3(x + v.x, y + v.y, z + v.z);
-    }
-    
-    Vector3 operator-(const Vector3& v) const {
-        return Vector3(x - v.x, y - v.y, z - v.z);
-    }
-    
-    Vector3 operator*(T scalar) const {
-        return Vector3(x * scalar, y * scalar, z * scalar);
-    }
-    
-    T dot(const Vector3& v) const {
-        return x * v.x + y * v.y + z * v.z;
-    }
-    
-    Vector3 cross(const Vector3& v) const {
-        return Vector3(
-            y * v.z - z * v.y,
-            z * v.x - x * v.z,
-            x * v.y - y * v.x
-        );
-    }
-    
-    T length() const {
-        return sqrt(x*x + y*y + z*z);
-    }
-    
-    Vector3 normalize() const {
-        T len = length();
-        if (len > 0) return Vector3(x/len, y/len, z/len);
-        return *this;
-    }
-};
-
-using Vec3 = Vector3<float>;
-
-// ========== MATRIX ==========
-
-template<typename T>
-class Matrix4 {
+class KillAura {
 private:
-    T m[4][4];
+    float range = 3.4f;
+    float cps = 12.5f;
+    bool silent = true;
     
 public:
-    Matrix4() {
-        for (int i = 0; i < 4; i++)
-            for (int j = 0; j < 4; j++)
-                m[i][j] = (i == j) ? 1 : 0;
+    void update() {
+        Entity target = getNearestEntity();
+        if (target.isValid() && distance(target) <= range) {
+            attack(target);
+            if (silent) {
+                rotateCamera(target);
+            }
+        }
     }
     
-    static Matrix4 identity() {
-        return Matrix4();
-    }
-    
-    static Matrix4 translation(T x, T y, T z) {
-        Matrix4 result;
-        result.m[0][3] = x;
-        result.m[1][3] = y;
-        result.m[2][3] = z;
-        return result;
-    }
-    
-    static Matrix4 rotationX(T angle) {
-        Matrix4 result;
-        T c = cos(angle);
-        T s = sin(angle);
-        result.m[1][1] = c; result.m[1][2] = -s;
-        result.m[2][1] = s; result.m[2][2] = c;
-        return result;
-    }
-    
-    static Matrix4 rotationY(T angle) {
-        Matrix4 result;
-        T c = cos(angle);
-        T s = sin(angle);
-        result.m[0][0] = c; result.m[0][2] = s;
-        result.m[2][0] = -s; result.m[2][2] = c;
-        return result;
-    }
-    
-    static Matrix4 rotationZ(T angle) {
-        Matrix4 result;
-        T c = cos(angle);
-        T s = sin(angle);
-        result.m[0][0] = c; result.m[0][1] = -s;
-        result.m[1][0] = s; result.m[1][1] = c;
-        return result;
-    }
-    
-    static Matrix4 scale(T x, T y, T z) {
-        Matrix4 result;
-        result.m[0][0] = x;
-        result.m[1][1] = y;
-        result.m[2][2] = z;
-        return result;
-    }
-    
-    Matrix4 operator*(const Matrix4& other) const {
-        Matrix4 result;
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                result.m[i][j] = 0;
-                for (int k = 0; k < 4; k++) {
-                    result.m[i][j] += m[i][k] * other.m[k][j];
+    Entity getNearestEntity() {
+        Entity* best = nullptr;
+        float bestDist = range;
+        for (Entity e : world.getEntities()) {
+            if (e.isPlayer() && !e.isFriend()) {
+                float dist = getDistance(e);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    best = &e;
                 }
             }
         }
-        return result;
-    }
-    
-    Vector3<T> transform(const Vector3<T>& v) const {
-        T x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3];
-        T y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3];
-        T z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3];
-        T w = m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3];
-        return Vector3<T>(x/w, y/w, z/w);
+        return *best;
     }
 };
-
-// ========== MEMORY POOL ==========
-
-class MemoryArena {
-private:
-    static constexpr size_t POOL_SIZE = 8192;
-    static constexpr size_t MAX_BLOCKS = 1024;
-    
-    struct Block {
-        void* ptr;
-        bool used;
-        size_t size;
-    };
-    
-    vector<Block> blocks;
-    mutex mtx;
-    
-public:
-    MemoryArena() {
-        blocks.reserve(MAX_BLOCKS);
-        for (size_t i = 0; i < MAX_BLOCKS; i++) {
-            blocks.push_back({malloc(POOL_SIZE), false, POOL_SIZE});
-        }
-    }
-    
-    ~MemoryArena() {
-        for (auto& block : blocks) free(block.ptr);
-    }
-    
-    void* allocate(size_t size) {
-        lock_guard<mutex> lock(mtx);
-        for (auto& block : blocks) {
-            if (!block.used && block.size >= size) {
-                block.used = true;
-                return block.ptr;
-            }
-        }
-        return malloc(size);
-    }
-    
-    void deallocate(void* ptr) {
-        lock_guard<mutex> lock(mtx);
-        for (auto& block : blocks) {
-            if (block.ptr == ptr) {
-                block.used = false;
-                return;
-            }
-        }
-        free(ptr);
-    }
-};
-
-// ========== MAIN SYSTEM ==========
-
-class Application {
-private:
-    bool running;
-    float delta;
-    chrono::steady_clock::time_point lastFrame;
-    unique_ptr<MemoryArena> memory;
-    
-public:
-    Application() : running(false), delta(0) {
-        memory = make_unique<MemoryArena>();
-        cout << "[system] initialized" << endl;
-    }
-    
-    bool init() {
-        running = true;
-        lastFrame = chrono::steady_clock::now();
-        return true;
-    }
-    
-    void update() {
-        auto now = chrono::steady_clock::now();
-        delta = chrono::duration<float>(now - lastFrame).count();
-        lastFrame = now;
-    }
-    
-    void render() {
-        // render logic
-    }
-    
-    void run() {
-        if (!init()) return;
-        while (running) {
-            update();
-            render();
-            this_thread::sleep_for(chrono::milliseconds(16));
-        }
-    }
-};
-
-} // namespace engine
 
 int main() {
-    auto app = make_unique<engine::Application>();
-    app->run();
+    KillAura aura;
+    while (true) {
+        aura.update();
+        Sleep(1000 / 20);
+    }
     return 0;
 }`;
 
-    let currentIndex = 0;
-    let displayText = "";
-    const maxChars = fullCode.length;
+    // ========== КОДЫ ДЛЯ 5 РАЗРАБОТЧИКОВ ==========
+    const devCodes = [
+        { name: "nexus", code: `// AntiCheat Bypass v2
+#include "Bypass.h"
 
+void bypassGrim() {
+    while (true) {
+        sendFakeRotation();
+        delay(10);
+        cancelVelocity();
+    }
+}` },
+        { name: "vortex", code: `// Visual Engine
+class Renderer {
+    void drawESP(Entity e) {
+        Box box = e.getBoundingBox();
+        drawOutline(box, Color(0,255,0));
+        drawNametag(e.getName());
+        drawHealthBar(e.getHealth());
+    }
+}` },
+        { name: "zenix", code: `// Reach Module
+float reachDistance = 3.8f;
+bool hitThroughWalls = false;
+
+void onAttack(Entity target) {
+    if (getDistance(target) <= reachDistance) {
+        target.damage(7.0f);
+        if (hitThroughWalls) {
+            ignoreCollision(target);
+        }
+    }
+}` },
+        { name: "karma", code: `// Velocity Reducer
+void onHurt(Vector3 velocity) {
+    float reduction = 0.85f;
+    velocity.x *= reduction;
+    velocity.z *= reduction;
+    if (isInAir()) {
+        velocity.y *= 0.9f;
+    }
+    setVelocity(velocity);
+}` },
+        { name: "lunar", code: `// Fly & Speed
+bool flyMode = true;
+float flySpeed = 0.3f;
+
+void onTick() {
+    if (flyMode && !isOnGround()) {
+        setMotion(flySpeed, 0, flySpeed);
+    }
+}` }
+    ];
+
+    // Скорости печати (символов в секунду)
+    const devSpeeds = [18, 32, 24, 45, 12];
+
+    // Состояния для каждого разработчика
+    let devStates = devCodes.map((dev, idx) => ({
+        name: dev.name,
+        fullCode: dev.code,
+        currentIndex: 0,
+        displayText: "",
+        speed: devSpeeds[idx],
+        lastUpdate: performance.now(),
+        totalChars: dev.code.length
+    }));
+
+    // Состояние твоего кода
+    let mainIndex = 0;
+    let mainDisplay = "";
+    const mainTotal = yourCode.length;
+    let mainLastUpdate = performance.now();
+
+    // DOM элементы
     const codeDisplay = document.getElementById("codeDisplay");
     const lineNumbersDiv = document.getElementById("lineNumbers");
-    const charCountSpan = document.getElementById("charCount");
-    const lineCountSpan = document.getElementById("lineCount");
-    const progressPercentSpan = document.getElementById("progressPercent");
-    const progressFill = document.getElementById("progressFill");
+    const progressInfo = document.getElementById("progressInfo");
+    const sidePanel = document.getElementById("sidePanel");
 
-    function updateUI() {
-        // Отображаем код
-        let escaped = displayText.replace(/&/g, '&amp;')
+    // Обновление твоего кода
+    function updateMainCode() {
+        let escaped = mainDisplay.replace(/&/g, '&amp;')
                                  .replace(/</g, '&lt;')
                                  .replace(/>/g, '&gt;')
                                  .replace(/ /g, '&nbsp;');
         codeDisplay.innerHTML = escaped;
         
-        // Номера строк
-        const lines = displayText.split('\n');
-        const lineCount = lines.length;
+        const lines = mainDisplay.split('\n');
         let lineHtml = "";
-        for (let i = 1; i <= Math.max(lineCount, 25); i++) {
+        for (let i = 1; i <= Math.max(lines.length, 20); i++) {
             lineHtml += i + "<br>";
         }
         lineNumbersDiv.innerHTML = lineHtml;
         
-        // Статистика
-        charCountSpan.innerText = currentIndex;
-        lineCountSpan.innerText = lineCount;
-        const percent = Math.floor((currentIndex / maxChars) * 100);
-        progressPercentSpan.innerText = percent + "%";
-        progressFill.style.width = percent + "%";
+        const percent = Math.floor((mainIndex / mainTotal) * 100);
+        progressInfo.innerText = `your progress: ${percent}%`;
         
-        // Скролл вниз
         const container = document.querySelector(".code-area");
-        container.scrollTop = container.scrollHeight;
+        if (container) container.scrollTop = container.scrollHeight;
     }
 
-    function addChar() {
-        if (currentIndex < maxChars) {
-            displayText += fullCode[currentIndex];
-            currentIndex++;
-            updateUI();
-            if (currentIndex >= maxChars) {
-                document.removeEventListener("keydown", onKeyPress);
-            }
+    function addMainChar() {
+        if (mainIndex < mainTotal) {
+            mainDisplay += yourCode[mainIndex];
+            mainIndex++;
+            updateMainCode();
         }
     }
 
+    // Обновление кода разработчиков
+    function renderDevWindows() {
+        sidePanel.innerHTML = "";
+        for (let i = 0; i < devStates.length; i++) {
+            const dev = devStates[i];
+            const percent = Math.floor((dev.currentIndex / dev.totalChars) * 100);
+            
+            // Экранируем код для отображения
+            let codePreview = dev.displayText;
+            if (codePreview.length > 120) {
+                codePreview = codePreview.substring(0, 117) + "...";
+            }
+            let escapedCode = codePreview.replace(/&/g, '&amp;')
+                                         .replace(/</g, '&lt;')
+                                         .replace(/>/g, '&gt;');
+            
+            const windowDiv = document.createElement('div');
+            windowDiv.className = 'dev-window';
+            windowDiv.innerHTML = `
+                <div class="dev-header">
+                    <span class="dev-name">${dev.name}</span>
+                    <span class="dev-status">${percent}%</span>
+                </div>
+                <div class="dev-code">${escapedCode}</div>
+                <div class="dev-progress">
+                    <div class="dev-progress-fill" style="width: ${percent}%"></div>
+                </div>
+            `;
+            sidePanel.appendChild(windowDiv);
+        }
+    }
+
+    function updateDevCode(dev, now) {
+        const timeDelta = Math.min(0.1, (now - dev.lastUpdate) / 1000);
+        const charsToAdd = Math.floor(dev.speed * timeDelta);
+        
+        if (charsToAdd > 0 && dev.currentIndex < dev.totalChars) {
+            let newIndex = Math.min(dev.currentIndex + charsToAdd, dev.totalChars);
+            dev.displayText += dev.fullCode.substring(dev.currentIndex, newIndex);
+            dev.currentIndex = newIndex;
+        }
+        dev.lastUpdate = now;
+    }
+
+    // Анимационный цикл для разработчиков
+    function animateDevs(now) {
+        let anyActive = false;
+        for (let i = 0; i < devStates.length; i++) {
+            if (devStates[i].currentIndex < devStates[i].totalChars) {
+                anyActive = true;
+                updateDevCode(devStates[i], now);
+            }
+        }
+        renderDevWindows();
+        if (anyActive) {
+            requestAnimationFrame(animateDevs);
+        }
+    }
+
+    // Обработчик клавиш для твоего кода
     function onKeyPress(e) {
-        // Игнорируем служебные клавиши
         const ignore = ["Control", "Alt", "Shift", "Meta", "Escape", "Tab", 
                        "CapsLock", "NumLock", "ScrollLock", "Pause", "Insert",
                        "Home", "PageUp", "Delete", "End", "PageDown"];
         if (ignore.includes(e.key)) return;
-        addChar();
+        addMainChar();
+        if (mainIndex >= mainTotal) {
+            document.removeEventListener("keydown", onKeyPress);
+        }
     }
 
-    function resetCode() {
-        displayText = "";
-        currentIndex = 0;
-        updateUI();
+    function resetMainCode() {
+        mainDisplay = "";
+        mainIndex = 0;
+        updateMainCode();
         document.addEventListener("keydown", onKeyPress);
     }
 
-    updateUI();
+    // Инициализация
+    updateMainCode();
+    renderDevWindows();
     document.addEventListener("keydown", onKeyPress);
+    requestAnimationFrame(animateDevs);
 </script>
 </body>
 </html>
