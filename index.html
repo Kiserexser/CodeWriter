@@ -23,7 +23,6 @@
             margin: 0 auto;
         }
 
-        /* Хедер */
         .header {
             margin-bottom: 24px;
             display: flex;
@@ -51,14 +50,12 @@
             font-size: 12px;
         }
 
-        /* Основная сетка */
         .workspace {
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
         }
 
-        /* Главный редактор (слева) */
         .main-editor {
             flex: 3;
             min-width: 400px;
@@ -135,7 +132,6 @@
             51%, 100% { opacity: 0; }
         }
 
-        /* Боковая панель с 5 окнами */
         .side-panel {
             flex: 1.2;
             min-width: 280px;
@@ -149,7 +145,6 @@
             border: 1px solid #2a2a2a;
             border-radius: 10px;
             overflow: hidden;
-            transition: all 0.2s;
         }
 
         .dev-header {
@@ -198,7 +193,6 @@
             transition: width 0.1s linear;
         }
 
-        /* Футер */
         .footer {
             margin-top: 24px;
             padding-top: 16px;
@@ -257,7 +251,6 @@
     </div>
 
     <div class="workspace">
-        <!-- Главный редактор -->
         <div class="main-editor">
             <div class="editor-header">
                 <div class="editor-title">📁 YOU · main.cpp</div>
@@ -272,7 +265,6 @@
             </div>
         </div>
 
-        <!-- 5 окон других разработчиков -->
         <div class="side-panel" id="sidePanel"></div>
     </div>
 
@@ -284,7 +276,7 @@
 </div>
 
 <script>
-    // ========== ТВОЙ КОД (основной) ==========
+    // ========== ТВОЙ КОД ==========
     const yourCode = `#include <iostream>
 #include <vector>
 #include "MinecraftCheat.h"
@@ -387,10 +379,9 @@ void onTick() {
 }` }
     ];
 
-    // Скорости печати (символов в секунду)
-    const devSpeeds = [18, 32, 24, 45, 12];
+    // Скорости от 18 до 40 символов в секунду
+    const devSpeeds = [22, 35, 28, 40, 18];
 
-    // Состояния для каждого разработчика
     let devStates = devCodes.map((dev, idx) => ({
         name: dev.name,
         fullCode: dev.code,
@@ -401,19 +392,15 @@ void onTick() {
         totalChars: dev.code.length
     }));
 
-    // Состояние твоего кода
     let mainIndex = 0;
     let mainDisplay = "";
     const mainTotal = yourCode.length;
-    let mainLastUpdate = performance.now();
 
-    // DOM элементы
     const codeDisplay = document.getElementById("codeDisplay");
     const lineNumbersDiv = document.getElementById("lineNumbers");
     const progressInfo = document.getElementById("progressInfo");
     const sidePanel = document.getElementById("sidePanel");
 
-    // Обновление твоего кода
     function updateMainCode() {
         let escaped = mainDisplay.replace(/&/g, '&amp;')
                                  .replace(/</g, '&lt;')
@@ -443,14 +430,12 @@ void onTick() {
         }
     }
 
-    // Обновление кода разработчиков
     function renderDevWindows() {
         sidePanel.innerHTML = "";
         for (let i = 0; i < devStates.length; i++) {
             const dev = devStates[i];
             const percent = Math.floor((dev.currentIndex / dev.totalChars) * 100);
             
-            // Экранируем код для отображения
             let codePreview = dev.displayText;
             if (codePreview.length > 120) {
                 codePreview = codePreview.substring(0, 117) + "...";
@@ -487,7 +472,6 @@ void onTick() {
         dev.lastUpdate = now;
     }
 
-    // Анимационный цикл для разработчиков
     function animateDevs(now) {
         let anyActive = false;
         for (let i = 0; i < devStates.length; i++) {
@@ -502,7 +486,6 @@ void onTick() {
         }
     }
 
-    // Обработчик клавиш для твоего кода
     function onKeyPress(e) {
         const ignore = ["Control", "Alt", "Shift", "Meta", "Escape", "Tab", 
                        "CapsLock", "NumLock", "ScrollLock", "Pause", "Insert",
@@ -521,7 +504,6 @@ void onTick() {
         document.addEventListener("keydown", onKeyPress);
     }
 
-    // Инициализация
     updateMainCode();
     renderDevWindows();
     document.addEventListener("keydown", onKeyPress);
