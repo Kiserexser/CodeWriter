@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Code Writer | Live Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #0a0a0a;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            background: #1e1e1e;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            width: 1000px;
+            max-width: 100%;
+            border: 1px solid #333;
+        }
+        
+        .header {
+            background: #2d2d2d;
+            padding: 10px 16px;
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid #444;
+        }
+        
+        .window-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+        
+        .title {
+            color: #aaa;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        
+        .editor {
+            display: flex;
+            min-height: 500px;
+        }
+        
+        .line-numbers {
+            background: #1e1e1e;
+            color: #6e6e6e;
+            padding: 16px 10px;
+            text-align: right;
+            font-size: 13px;
+            line-height: 1.5;
+            user-select: none;
+            border-right: 1px solid #2d2d2d;
+        }
+        
+        .code-area {
+            flex: 1;
+            background: #1e1e1e;
+            padding: 16px;
+            overflow-y: auto;
+        }
+        
+        #codeDisplay {
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.5;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 16px;
+            background: #fff;
+            animation: blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        .status {
+            background: #007acc;
+            padding: 6px 16px;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 11px;
+        }
+        
+        .footer {
+            background: #2d2d2d;
+            padding: 8px 16px;
+            color: #888;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #444;
+        }
+        
+        button {
+            background: #0e639c;
+            border: none;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: monospace;
+        }
+        
+        button:hover {
+            background: #1177bb;
+        }
+        
+        .progress {
+            color: #4ec9b0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <div class="window-dot dot-red"></div>
+        <div class="window-dot dot-yellow"></div>
+        <div class="window-dot dot-green"></div>
+        <div class="title">main.cpp - Visual Studio Code (C++20)</div>
+    </div>
+    
+    <div class="editor">
+        <div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20</div>
+        <div class="code-area">
+            <div id="codeDisplay"></div>
+            <span class="cursor"></span>
+        </div>
+    </div>
+    
+    <div class="status">
+        <span>📁 GameEngine / main.cpp</span>
+        <span>⚡ Type ANY key</span>
+        <span>🖥️ C++20</span>
+    </div>
+    
+    <div class="footer">
+        <span>🔑 Нажми любую клавишу → появляется символ</span>
+        <span class="progress" id="progressText">0%</span>
+        <button onclick="resetCode()">⟳ Очистить</button>
+    </div>
+</div>
+
+<script>
+    // ========== 1200 символов C++ кода ==========
+    const fullCode = `#include <iostream>
+#include <vector>
+#include <memory>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <unordered_map>
+#include <functional>
+#include <algorithm>
+#include <cmath>
+
+using namespace std;
+
+namespace GameEngine {
+
+// ========== VECTOR MATH ==========
+
+template<typename T>
+class Vec3 {
+public:
+    T x, y, z;
+    
+    Vec3() : x(0), y(0), z(0) {}
+    Vec3(T x, T y, T z) : x(x), y(y), z(z) {}
+    
+    Vec3 operator+(const Vec3& v) const {
+        return Vec3(x + v.x, y + v.y, z + v.z);
+    }
+    
+    Vec3 operator-(const Vec3& v) const {
+        return Vec3(x - v.x, y - v.y, z - v.z);
+    }
+    
+    Vec3 operator*(T s) const {
+        return Vec3(x * s, y * s, z * s);
+    }
+    
+    T dot(const Vec3& v) const {
+        return x * v.x + y * v.y + z * v.z;
+    }
+    
+    Vec3 cross(const Vec3& v) const {
+        return Vec3(
+            y * v.z - z * v.y,
+            z * v.x - x * v.z,
+            x * v.y - y * v.x
+        );
+    }
+    
+    T length() const {
+        return sqrt(x*x + y*y + z*z);
+    }
+    
+    Vec3 normalize() const {
+        T len = length();
+        if (len > 0) return Vec3(x/len, y/len, z/len);
+        return *this;
+    }
+};
+
+using Vec3f = Vec3<float>;
+using Vec3d = Vec3<double>;
+
+// ========== MATRIX 4x4 ==========
+
+template<typename T>
+class Mat4 {
+private:
+    T m[4][4];
+    
+public:
+    Mat4() {
+        for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 4; j++)
+                m[i][j] = (i == j) ? 1 : 0;
+    }
+    
+    static Mat4 identity() {
+        return Mat4();
+    }
+    
+    static Mat4 translation(T x, T y, T z) {
+        Mat4 result;
+        result.m[0][3] = x;
+        result.m[1][3] = y;
+        result.m[2][3] = z;
+        return result;
+    }
+    
+    static Mat4 rotationX(T angle) {
+        Mat4 result;
+        T c = cos(angle);
+        T s = sin(angle);
+        result.m[1][1] = c;
+        result.m[1][2] = -s;
+        result.m[2][1] = s;
+        result.m[2][2] = c;
+        return result;
+    }
+    
+    static Mat4 rotationY(T angle) {
+        Mat4 result;
+        T c = cos(angle);
+        T s = sin(angle);
+        result.m[0][0] = c;
+        result.m[0][2] = s;
+        result.m[2][0] = -s;
+        result.m[2][2] = c;
+        return result;
+    }
+    
+    static Mat4 rotationZ(T angle) {
+        Mat4 result;
+        T c = cos(angle);
+        T s = sin(angle);
+        result.m[0][0] = c;
+        result.m[0][1] = -s;
+        result.m[1][0] = s;
+        result.m[1][1] = c;
+        return result;
+    }
+    
+    static Mat4 scale(T x, T y, T z) {
+        Mat4 result;
+        result.m[0][0] = x;
+        result.m[1][1] = y;
+        result.m[2][2] = z;
+        return result;
+    }
+    
+    Mat4 operator*(const Mat4& other) const {
+        Mat4 result;
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                result.m[i][j] = 0;
+                for (int k = 0; k < 4; k++) {
+                    result.m[i][j] += m[i][k] * other.m[k][j];
+                }
+            }
+        }
+        return result;
+    }
+    
+    Vec3<T> transform(const Vec3<T>& v) const {
+        T x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3];
+        T y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3];
+        T z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3];
+        T w = m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3];
+        return Vec3<T>(x/w, y/w, z/w);
+    }
+};
+
+using Mat4f = Mat4<float>;
+
+// ========== MEMORY POOL ==========
+
+class MemoryPool {
+private:
+    static constexpr size_t BLOCK_SIZE = 4096;
+    static constexpr size_t MAX_BLOCKS = 512;
+    
+    struct Block {
+        void* ptr;
+        bool used;
+        size_t size;
+    };
+    
+    vector<Block> blocks;
+    mutex mtx;
+    
+public:
+    MemoryPool() {
+        blocks.reserve(MAX_BLOCKS);
+        for (size_t i = 0; i < MAX_BLOCKS; i++) {
+            blocks.push_back({malloc(BLOCK_SIZE), false, BLOCK_SIZE});
+        }
+    }
+    
+    ~MemoryPool() {
+        for (auto& block : blocks) {
+            free(block.ptr);
+        }
+    }
+    
+    void* allocate(size_t size) {
+        lock_guard<mutex> lock(mtx);
+        for (auto& block : blocks) {
+            if (!block.used && block.size >= size) {
+                block.used = true;
+                return block.ptr;
+            }
+        }
+        return malloc(size);
+    }
+    
+    void deallocate(void* ptr) {
+        lock_guard<mutex> lock(mtx);
+        for (auto& block : blocks) {
+            if (block.ptr == ptr) {
+                block.used = false;
+                return;
+            }
+        }
+        free(ptr);
+    }
+};
+
+// ========== ENTITY COMPONENT SYSTEM ==========
+
+using EntityID = uint32_t;
+
+class Component {
+public:
+    virtual ~Component() = default;
+};
+
+template<typename T>
+class ComponentManager {
+private:
+    unordered_map<EntityID, T> components;
+    
+public:
+    void add(EntityID entity, const T& component) {
+        components[entity] = component;
+    }
+    
+    void remove(EntityID entity) {
+        components.erase(entity);
+    }
+    
+    T& get(EntityID entity) {
+        return components[entity];
+    }
+    
+    bool has(EntityID entity) const {
+        return components.find(entity) != components.end();
+    }
+};
+
+struct Transform : Component {
+    Vec3f position;
+    Vec3f rotation;
+    Vec3f scale;
+    
+    Transform() : position(0,0,0), rotation(0,0,0), scale(1,1,1) {}
+};
+
+struct Velocity : Component {
+    Vec3f linear;
+    Vec3f angular;
+};
+
+struct Renderable : Component {
+    string modelPath;
+    string texturePath;
+    bool visible;
+};
+
+// ========== RENDER PIPELINE ==========
+
+class Shader {
+private:
+    string vertexSource;
+    string fragmentSource;
+    uint32_t programID;
+    
+public:
+    Shader(const string& vs, const string& fs)
+        : vertexSource(vs), fragmentSource(fs), programID(0) {}
+    
+    bool compile() {
+        // Compilation logic here
+        return true;
+    }
+    
+    void bind() {
+        // Bind shader
+    }
+};
+
+class Texture {
+private:
+    int width, height, channels;
+    unsigned char* data;
+    uint32_t textureID;
+    
+public:
+    Texture(const string& path) {
+        // Load texture
+    }
+    
+    ~Texture() {
+        if (data) delete[] data;
+    }
+    
+    void bind(uint32_t slot = 0) {
+        // Bind texture
+    }
+};
+
+class Mesh {
+private:
+    vector<Vec3f> vertices;
+    vector<uint32_t> indices;
+    vector<Vec3f> normals;
+    vector<Vec2f> uvs;
+    uint32_t vao, vbo, ebo;
+    
+public:
+    Mesh(const vector<Vec3f>& verts, const vector<uint32_t>& inds)
+        : vertices(verts), indices(inds) {}
+    
+    void upload() {
+        // Upload to GPU
+    }
+    
+    void draw() {
+        // Draw call
+    }
+};
+
+// ========== GAME ENGINE CORE ==========
+
+class GameEngine {
+private:
+    bool running;
+    float deltaTime;
+    chrono::steady_clock::time_point lastFrame;
+    unique_ptr<MemoryPool> memoryPool;
+    unordered_map<EntityID, unique_ptr<ComponentManager<Component>>> componentManagers;
+    vector<EntityID> entities;
+    EntityID nextEntityID;
+    
+public:
+    GameEngine() : running(false), deltaTime(0), nextEntityID(0) {
+        memoryPool = make_unique<MemoryPool>();
+        cout << "GameEngine initialized" << endl;
+    }
+    
+    ~GameEngine() {
+        shutdown();
+    }
+    
+    bool initialize() {
+        running = true;
+        lastFrame = chrono::steady_clock::now();
+        return true;
+    }
+    
+    void shutdown() {
+        running = false;
+    }
+    
+    EntityID createEntity() {
+        EntityID id = nextEntityID++;
+        entities.push_back(id);
+        return id;
+    }
+    
+    void destroyEntity(EntityID entity) {
+        auto it = find(entities.begin(), entities.end(), entity);
+        if (it != entities.end()) {
+            entities.erase(it);
+        }
+    }
+    
+    void update() {
+        auto now = chrono::steady_clock::now();
+        deltaTime = chrono::duration<float>(now - lastFrame).count();
+        lastFrame = now;
+        
+        // Update entities
+        for (auto entity : entities) {
+            // Update logic here
+        }
+    }
+    
+    void render() {
+        // Render logic here
+    }
+    
+    void run() {
+        if (!initialize()) return;
+        
+        while (running) {
+            update();
+            render();
+            this_thread::sleep_for(chrono::milliseconds(16));
+        }
+        
+        shutdown();
+    }
+    
+    float getDeltaTime() const { return deltaTime; }
+};
+
+} // namespace GameEngine
+
+// ========== MAIN ENTRY POINT ==========
+
+int main() {
+    auto engine = make_unique<GameEngine::GameEngine>();
+    engine->run();
+    return 0;
+}`;
+
+    let currentIndex = 0;
+    let displayText = "";
+    
+    const codeDisplay = document.getElementById("codeDisplay");
+    const lineNumbersDiv = document.getElementById("lineNumbers");
+    const progressText = document.getElementById("progressText");
+    const maxChars = fullCode.length;
+    
+    function updateDisplay() {
+        // Обновляем текст
+        codeDisplay.innerHTML = displayText.replace(/ /g, "&nbsp;").replace(/\\n/g, "<br>");
+        
+        // Обновляем номера строк
+        const lines = displayText.split('\\n');
+        const lineCount = lines.length;
+        let lineNumbersHtml = "";
+        for (let i = 1; i <= Math.max(lineCount, 20); i++) {
+            lineNumbersHtml += i + "<br>";
+        }
+        lineNumbersDiv.innerHTML = lineNumbersHtml;
+        
+        // Обновляем прогресс
+        const percent = Math.floor((currentIndex / maxChars) * 100);
+        progressText.innerText = percent + "%";
+        
+        // Прокрутка вниз
+        const codeArea = document.querySelector(".code-area");
+        codeArea.scrollTop = codeArea.scrollHeight;
+    }
+    
+    function addCharacter() {
+        if (currentIndex < maxChars) {
+            displayText += fullCode[currentIndex];
+            currentIndex++;
+            updateDisplay();
+            
+            if (currentIndex >= maxChars) {
+                document.removeEventListener("keydown", onKeyPress);
+            }
+        }
+    }
+    
+    function onKeyPress(e) {
+        // Игнорируем специальные клавиши
+        if (e.key === "Control" || e.key === "Alt" || e.key === "Shift" || 
+            e.key === "Meta" || e.key === "Escape" || e.key === "Tab" ||
+            e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" ||
+            e.key === "Pause" || e.key === "Insert" || e.key === "Home" ||
+            e.key === "PageUp" || e.key === "Delete" || e.key === "End" ||
+            e.key === "PageDown") {
+            return;
+        }
+        
+        addCharacter();
+    }
+    
+    function resetCode() {
+        displayText = "";
+        currentIndex = 0;
+        updateDisplay();
+        document.addEventListener("keydown", onKeyPress);
+    }
+    
+    // Запускаем
+    updateDisplay();
+    document.addEventListener("keydown", onKeyPress);
+</script>
+</body>
+</html>
