@@ -325,9 +325,9 @@ int main() {
     return 0;
 }`;
 
-    // ========== КОДЫ ДЛЯ 5 РАЗРАБОТЧИКОВ ==========
+    // ========== ДЛИННЫЕ КОДЫ ДЛЯ 5 РАЗРАБОТЧИКОВ (по 300-500 символов) ==========
     const devCodes = [
-        { name: "nexus", code: `// AntiCheat Bypass v2
+        { name: "nexus", code: `// AntiCheat Bypass v2.3 - Grim / Vulcan bypass
 #include "Bypass.h"
 
 void bypassGrim() {
@@ -335,20 +335,46 @@ void bypassGrim() {
         sendFakeRotation();
         delay(10);
         cancelVelocity();
+        if (isOnGround()) {
+            spoofPosition();
+        }
+        packetOrderOptimizer();
+        Thread.sleep(5);
+    }
+}
+
+void cancelVelocity() {
+    if (hurtTime > 0) {
+        motionX *= 0.3;
+        motionZ *= 0.3;
     }
 }` },
-        { name: "vortex", code: `// Visual Engine
+        { name: "vortex", code: `// Visual Engine v4.2 - ESP / Tracers / Chams
 class Renderer {
     void drawESP(Entity e) {
         Box box = e.getBoundingBox();
         drawOutline(box, Color(0,255,0));
         drawNametag(e.getName());
         drawHealthBar(e.getHealth());
+        drawArmorBar(e.getArmor());
+        if (e.isTarget()) {
+            drawGlow(e, Color.RED);
+        }
+    }
+    
+    void drawTracers(Entity e) {
+        Vector3 screenPos = WorldToScreen(e.getPos());
+        drawLine(screenWidth/2, screenHeight, screenPos.x, screenPos.y, Color.WHITE);
+    }
+    
+    void fullBright() {
+        gamma = 100.0f;
     }
 }` },
-        { name: "zenix", code: `// Reach Module
+        { name: "zenix", code: `// Reach & HitBox Module v3.0
 float reachDistance = 3.8f;
 bool hitThroughWalls = false;
+bool expandedHitbox = true;
 
 void onAttack(Entity target) {
     if (getDistance(target) <= reachDistance) {
@@ -356,9 +382,17 @@ void onAttack(Entity target) {
         if (hitThroughWalls) {
             ignoreCollision(target);
         }
+        if (expandedHitbox) {
+            target.setHitbox(0.8f);
+        }
     }
+}
+
+void setReach(float newReach) {
+    reachDistance = newReach;
+    cout << "Reach set to " << newReach << endl;
 }` },
-        { name: "karma", code: `// Velocity Reducer
+        { name: "karma", code: `// Velocity & NoKnockback v2.1
 void onHurt(Vector3 velocity) {
     float reduction = 0.85f;
     velocity.x *= reduction;
@@ -367,20 +401,40 @@ void onHurt(Vector3 velocity) {
         velocity.y *= 0.9f;
     }
     setVelocity(velocity);
+}
+
+void noKnockback() {
+    if (hurtTime > 0) {
+        motionX = 0;
+        motionZ = 0;
+        hurttime = 0;
+    }
+}
+
+void velocityReduction(float percent) {
+    reduction = percent / 100.0f;
 }` },
-        { name: "lunar", code: `// Fly & Speed
+        { name: "lunar", code: `// Fly & Speed & Flight modes
 bool flyMode = true;
 float flySpeed = 0.3f;
+int flyType = 2; // 0=vanilla, 1=glide, 2=creative
 
 void onTick() {
     if (flyMode && !isOnGround()) {
-        setMotion(flySpeed, 0, flySpeed);
+        if (flyType == 0) setMotion(flySpeed, 0, flySpeed);
+        if (flyType == 1) glide();
+        if (flyType == 2) creativeFly();
+    }
+    if (speedEnabled) {
+        if (isOnGround()) {
+            setMotion(motionX * 1.35, motionY, motionZ * 1.35);
+        }
     }
 }` }
     ];
 
-    // Скорости от 18 до 40 символов в секунду
-    const devSpeeds = [22, 35, 28, 40, 18];
+    // Скорости от 25 до 50 символов в секунду (быстро и заметно)
+    const devSpeeds = [28, 42, 35, 48, 30];
 
     let devStates = devCodes.map((dev, idx) => ({
         name: dev.name,
@@ -489,7 +543,8 @@ void onTick() {
     function onKeyPress(e) {
         const ignore = ["Control", "Alt", "Shift", "Meta", "Escape", "Tab", 
                        "CapsLock", "NumLock", "ScrollLock", "Pause", "Insert",
-                       "Home", "PageUp", "Delete", "End", "PageDown"];
+                       "Home", "PageUp", "Delete", "End", "PageDown", "ArrowUp", 
+                       "ArrowDown", "ArrowLeft", "ArrowRight"];
         if (ignore.includes(e.key)) return;
         addMainChar();
         if (mainIndex >= mainTotal) {
