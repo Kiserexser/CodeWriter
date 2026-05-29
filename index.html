@@ -3,334 +3,323 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GameEngine.cpp - Visual Studio Code</title>
+    <title>Lunxes Studio | Live Code</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            background: #0a0a0a;
-            font-family: 'Consolas', 'Courier New', 'Fira Code', monospace;
+            background: #0a0a0f;
+            font-family: 'Inter', 'Segoe UI', monospace;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 2rem;
         }
-        
-        .vscode {
-            background: #1e1e1e;
-            border-radius: 8px;
+
+        /* Анимация градиента */
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(8, 8, 14, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 32px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8), 0 0 30px rgba(0, 200, 255, 0.05);
             overflow: hidden;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.8);
-            width: 1200px;
-            max-width: 100%;
-            border: 1px solid #2d2d2d;
+            transition: all 0.3s ease;
         }
-        
-        .title-bar {
-            background: #2d2d2d;
-            padding: 10px 16px;
+
+        /* Хедер */
+        .header {
+            padding: 1.5rem 2rem;
+            background: rgba(10, 10, 18, 0.8);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
             display: flex;
             align-items: center;
             gap: 12px;
-            border-bottom: 1px solid #3e3e3e;
         }
-        
-        .window-controls {
+
+        .logo-icon {
+            font-size: 32px;
+            filter: drop-shadow(0 0 8px cyan);
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #fff, #00ffff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .badge {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 13px;
+            color: #0ff;
+            font-weight: 500;
+        }
+
+        /* Статистика */
+        .stats {
             display: flex;
-            gap: 8px;
+            gap: 2rem;
         }
-        
-        .window-btn {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            transition: opacity 0.2s;
+
+        .stat-item {
+            text-align: center;
         }
-        
-        .window-btn:hover { opacity: 0.8; }
-        .close { background: #ff5f56; }
-        .minimize { background: #ffbd2e; }
-        .maximize { background: #27c93f; }
-        
-        .file-tabs {
-            display: flex;
-            gap: 4px;
-            margin-left: 20px;
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 10px cyan;
         }
-        
-        .tab {
-            background: #2d2d2d;
-            padding: 4px 16px;
-            font-size: 12px;
-            color: #ccc;
-            border-radius: 6px 6px 0 0;
-            cursor: default;
-        }
-        
-        .tab.active {
-            background: #1e1e1e;
-            color: white;
-        }
-        
-        .git-branch {
-            margin-left: auto;
+
+        .stat-label {
             font-size: 11px;
-            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6b7280;
+        }
+
+        /* Основной редактор */
+        .editor {
             display: flex;
-            align-items: center;
-            gap: 6px;
+            background: #0a0a0f;
         }
-        
-        .main-content {
-            display: flex;
-            min-height: 550px;
-        }
-        
-        .sidebar {
-            width: 48px;
-            background: #252526;
-            border-right: 1px solid #3e3e3e;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 12px;
-            gap: 20px;
-        }
-        
-        .sidebar-icon {
-            font-size: 20px;
-            opacity: 0.6;
-            cursor: default;
-        }
-        
-        .sidebar-icon.active {
-            opacity: 1;
-            border-left: 2px solid #007acc;
-            padding-left: 6px;
-        }
-        
-        .editor-area {
-            flex: 1;
-            display: flex;
-        }
-        
+
         .line-numbers {
-            background: #1e1e1e;
-            color: #6e6e6e;
-            padding: 16px 12px;
+            padding: 2rem 1rem;
             text-align: right;
+            color: #3f3f4a;
+            font-family: 'Fira Code', monospace;
             font-size: 13px;
-            line-height: 1.5;
-            user-select: none;
-            border-right: 1px solid #2d2d2d;
-            font-family: monospace;
+            line-height: 1.6;
+            border-right: 1px solid rgba(0, 255, 255, 0.1);
+            background: #050508;
         }
-        
-        .code-container {
+
+        .code-area {
             flex: 1;
-            background: #1e1e1e;
-            padding: 16px;
-            overflow-y: auto;
+            padding: 2rem;
             position: relative;
+            background: #0a0a0f;
         }
-        
+
         #codeDisplay {
-            color: #d4d4d4;
-            font-size: 13px;
-            line-height: 1.5;
-            font-family: 'Consolas', 'Courier New', monospace;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #e2e8f0;
             white-space: pre-wrap;
-            word-break: break-all;
+            word-break: break-word;
         }
-        
+
         .cursor {
             display: inline-block;
             width: 2px;
-            height: 16px;
-            background: #fff;
+            height: 18px;
+            background: #0ff;
             animation: blink 1s infinite;
             vertical-align: middle;
             margin-left: 2px;
+            box-shadow: 0 0 5px cyan;
         }
-        
+
         @keyframes blink {
             0%, 50% { opacity: 1; }
             51%, 100% { opacity: 0; }
         }
-        
-        .status-bar {
-            background: #007acc;
-            padding: 6px 16px;
-            display: flex;
-            justify-content: space-between;
-            color: white;
-            font-size: 11px;
-            font-family: monospace;
-        }
-        
-        .status-left, .status-right {
-            display: flex;
-            gap: 16px;
-        }
-        
+
+        /* Футер */
         .footer {
-            background: #2d2d2d;
-            padding: 8px 16px;
+            padding: 1rem 2rem;
+            background: rgba(5, 5, 10, 0.9);
+            border-top: 1px solid rgba(0, 255, 255, 0.1);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 11px;
-            color: #888;
-            border-top: 1px solid #3e3e3e;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
-        
-        .btn-reset {
-            background: #0e639c;
-            border: none;
-            color: white;
-            padding: 4px 14px;
-            border-radius: 4px;
+
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: #1f1f2a;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #0ff, #00aaff);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px cyan;
+        }
+
+        button {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.4);
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: #0ff;
+            font-weight: 600;
             cursor: pointer;
-            font-family: monospace;
-            font-size: 11px;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            font-family: inherit;
         }
-        
-        .btn-reset:hover {
-            background: #1177bb;
+
+        button:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            border-color: cyan;
         }
-        
-        .progress-text {
-            color: #4ec9b0;
-            font-weight: bold;
+
+        .info {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 12px;
+            color: #6b7280;
         }
-        
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
+
+        .info span {
+            color: #0ff;
         }
-        
-        ::-webkit-scrollbar-track {
-            background: #1e1e1e;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #3e3e3e;
-            border-radius: 5px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #4e4e4e;
+
+        @media (max-width: 768px) {
+            .header, .footer {
+                flex-direction: column;
+                text-align: center;
+            }
+            .stats {
+                justify-content: center;
+            }
+            .line-numbers {
+                padding: 1rem 0.5rem;
+                font-size: 10px;
+            }
+            .code-area {
+                padding: 1rem;
+            }
         }
     </style>
 </head>
 <body>
 
-<div class="vscode">
-    <div class="title-bar">
-        <div class="window-controls">
-            <div class="window-btn close"></div>
-            <div class="window-btn minimize"></div>
-            <div class="window-btn maximize"></div>
+<div class="container">
+    <div class="header">
+        <div class="logo">
+            <div class="logo-icon">✦</div>
+            <div class="logo-text">Lunxes Studio</div>
+            <div class="badge">live coding</div>
         </div>
-        <div class="file-tabs">
-            <div class="tab active">📄 main.cpp</div>
-            <div class="tab">🔧 shader.glsl</div>
-            <div class="tab">⚙️ CMakeLists.txt</div>
-        </div>
-        <div class="git-branch">
-            🔀 main
-            <span>●</span>
-        </div>
-    </div>
-    
-    <div class="main-content">
-        <div class="sidebar">
-            <div class="sidebar-icon active">📁</div>
-            <div class="sidebar-icon">🔍</div>
-            <div class="sidebar-icon">🔀</div>
-            <div class="sidebar-icon">🐞</div>
-            <div class="sidebar-icon">📦</div>
-        </div>
-        
-        <div class="editor-area">
-            <div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25</div>
-            <div class="code-container">
-                <div id="codeDisplay"></div>
-                <span class="cursor"></span>
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="charCount">0</div>
+                <div class="stat-label">symbols</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="lineCount">0</div>
+                <div class="stat-label">lines</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="progressPercent">0%</div>
+                <div class="stat-label">completed</div>
             </div>
         </div>
     </div>
-    
-    <div class="status-bar">
-        <div class="status-left">
-            <span>📁 GameEngine</span>
-            <span>🖥️ C++20</span>
-            <span>🔨 x64 Debug</span>
-        </div>
-        <div class="status-right">
-            <span>💻 0 errors</span>
-            <span>⚠️ 0 warnings</span>
-            <span>🎯 Ready</span>
+
+    <div class="editor">
+        <div class="line-numbers" id="lineNumbers">1<br>2<br>3<br>4<br>5<br>6<br>7<br>8<br>9<br>10<br>11<br>12<br>13<br>14<br>15<br>16<br>17<br>18<br>19<br>20<br>21<br>22<br>23<br>24<br>25</div>
+        <div class="code-area">
+            <div id="codeDisplay"></div>
+            <span class="cursor"></span>
         </div>
     </div>
-    
+
     <div class="footer">
-        <span>🔑 Press ANY key to start typing — code appears automatically</span>
-        <span class="progress-text" id="progressText">0%</span>
-        <button class="btn-reset" onclick="resetCode()">⟳ Reset</button>
+        <div class="info">
+            <span>⚡</span> type any key
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <button onclick="resetCode()">⟳ reset</button>
     </div>
 </div>
 
 <script>
+    // Длинный C++ код (настоящий, 2500+ символов)
     const fullCode = `#include <iostream>
 #include <vector>
 #include <memory>
 #include <thread>
-#include <mutex>
 #include <chrono>
-#include <unordered_map>
+#include <mutex>
 #include <functional>
 #include <algorithm>
 #include <cmath>
 
 using namespace std;
 
-namespace GameEngine {
+namespace engine {
 
-// ========== VECTOR MATH ==========
+// ========== MATH CORE ==========
 
 template<typename T>
-class Vec3 {
+class Vector3 {
 public:
     T x, y, z;
     
-    Vec3() : x(0), y(0), z(0) {}
-    Vec3(T x, T y, T z) : x(x), y(y), z(z) {}
+    Vector3() : x(0), y(0), z(0) {}
+    Vector3(T _x, T _y, T _z) : x(_x), y(_y), z(_z) {}
     
-    Vec3 operator+(const Vec3& v) const {
-        return Vec3(x + v.x, y + v.y, z + v.z);
+    Vector3 operator+(const Vector3& v) const {
+        return Vector3(x + v.x, y + v.y, z + v.z);
     }
     
-    Vec3 operator-(const Vec3& v) const {
-        return Vec3(x - v.x, y - v.y, z - v.z);
+    Vector3 operator-(const Vector3& v) const {
+        return Vector3(x - v.x, y - v.y, z - v.z);
     }
     
-    Vec3 operator*(T s) const {
-        return Vec3(x * s, y * s, z * s);
+    Vector3 operator*(T scalar) const {
+        return Vector3(x * scalar, y * scalar, z * scalar);
     }
     
-    T dot(const Vec3& v) const {
+    T dot(const Vector3& v) const {
         return x * v.x + y * v.y + z * v.z;
     }
     
-    Vec3 cross(const Vec3& v) const {
-        return Vec3(
+    Vector3 cross(const Vector3& v) const {
+        return Vector3(
             y * v.z - z * v.y,
             z * v.x - x * v.z,
             x * v.y - y * v.x
@@ -341,85 +330,78 @@ public:
         return sqrt(x*x + y*y + z*z);
     }
     
-    Vec3 normalize() const {
+    Vector3 normalize() const {
         T len = length();
-        if (len > 0) return Vec3(x/len, y/len, z/len);
+        if (len > 0) return Vector3(x/len, y/len, z/len);
         return *this;
     }
 };
 
-using Vec3f = Vec3<float>;
-using Vec3d = Vec3<double>;
+using Vec3 = Vector3<float>;
 
-// ========== MATRIX 4x4 ==========
+// ========== MATRIX ==========
 
 template<typename T>
-class Mat4 {
+class Matrix4 {
 private:
     T m[4][4];
     
 public:
-    Mat4() {
+    Matrix4() {
         for (int i = 0; i < 4; i++)
             for (int j = 0; j < 4; j++)
                 m[i][j] = (i == j) ? 1 : 0;
     }
     
-    static Mat4 identity() {
-        return Mat4();
+    static Matrix4 identity() {
+        return Matrix4();
     }
     
-    static Mat4 translation(T x, T y, T z) {
-        Mat4 result;
+    static Matrix4 translation(T x, T y, T z) {
+        Matrix4 result;
         result.m[0][3] = x;
         result.m[1][3] = y;
         result.m[2][3] = z;
         return result;
     }
     
-    static Mat4 rotationX(T angle) {
-        Mat4 result;
+    static Matrix4 rotationX(T angle) {
+        Matrix4 result;
         T c = cos(angle);
         T s = sin(angle);
-        result.m[1][1] = c;
-        result.m[1][2] = -s;
-        result.m[2][1] = s;
-        result.m[2][2] = c;
+        result.m[1][1] = c; result.m[1][2] = -s;
+        result.m[2][1] = s; result.m[2][2] = c;
         return result;
     }
     
-    static Mat4 rotationY(T angle) {
-        Mat4 result;
+    static Matrix4 rotationY(T angle) {
+        Matrix4 result;
         T c = cos(angle);
         T s = sin(angle);
-        result.m[0][0] = c;
-        result.m[0][2] = s;
-        result.m[2][0] = -s;
-        result.m[2][2] = c;
+        result.m[0][0] = c; result.m[0][2] = s;
+        result.m[2][0] = -s; result.m[2][2] = c;
         return result;
     }
     
-    static Mat4 rotationZ(T angle) {
-        Mat4 result;
+    static Matrix4 rotationZ(T angle) {
+        Matrix4 result;
         T c = cos(angle);
         T s = sin(angle);
-        result.m[0][0] = c;
-        result.m[0][1] = -s;
-        result.m[1][0] = s;
-        result.m[1][1] = c;
+        result.m[0][0] = c; result.m[0][1] = -s;
+        result.m[1][0] = s; result.m[1][1] = c;
         return result;
     }
     
-    static Mat4 scale(T x, T y, T z) {
-        Mat4 result;
+    static Matrix4 scale(T x, T y, T z) {
+        Matrix4 result;
         result.m[0][0] = x;
         result.m[1][1] = y;
         result.m[2][2] = z;
         return result;
     }
     
-    Mat4 operator*(const Mat4& other) const {
-        Mat4 result;
+    Matrix4 operator*(const Matrix4& other) const {
+        Matrix4 result;
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 result.m[i][j] = 0;
@@ -431,23 +413,21 @@ public:
         return result;
     }
     
-    Vec3<T> transform(const Vec3<T>& v) const {
+    Vector3<T> transform(const Vector3<T>& v) const {
         T x = m[0][0] * v.x + m[0][1] * v.y + m[0][2] * v.z + m[0][3];
         T y = m[1][0] * v.x + m[1][1] * v.y + m[1][2] * v.z + m[1][3];
         T z = m[2][0] * v.x + m[2][1] * v.y + m[2][2] * v.z + m[2][3];
         T w = m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3];
-        return Vec3<T>(x/w, y/w, z/w);
+        return Vector3<T>(x/w, y/w, z/w);
     }
 };
 
-using Mat4f = Mat4<float>;
-
 // ========== MEMORY POOL ==========
 
-class MemoryPool {
+class MemoryArena {
 private:
-    static constexpr size_t BLOCK_SIZE = 4096;
-    static constexpr size_t MAX_BLOCKS = 512;
+    static constexpr size_t POOL_SIZE = 8192;
+    static constexpr size_t MAX_BLOCKS = 1024;
     
     struct Block {
         void* ptr;
@@ -459,17 +439,15 @@ private:
     mutex mtx;
     
 public:
-    MemoryPool() {
+    MemoryArena() {
         blocks.reserve(MAX_BLOCKS);
         for (size_t i = 0; i < MAX_BLOCKS; i++) {
-            blocks.push_back({malloc(BLOCK_SIZE), false, BLOCK_SIZE});
+            blocks.push_back({malloc(POOL_SIZE), false, POOL_SIZE});
         }
     }
     
-    ~MemoryPool() {
-        for (auto& block : blocks) {
-            free(block.ptr);
-        }
+    ~MemoryArena() {
+        for (auto& block : blocks) free(block.ptr);
     }
     
     void* allocate(size_t size) {
@@ -495,295 +473,123 @@ public:
     }
 };
 
-// ========== ENTITY COMPONENT SYSTEM ==========
+// ========== MAIN SYSTEM ==========
 
-using EntityID = uint32_t;
-
-class Component {
-public:
-    virtual ~Component() = default;
-};
-
-template<typename T>
-class ComponentManager {
-private:
-    unordered_map<EntityID, T> components;
-    
-public:
-    void add(EntityID entity, const T& component) {
-        components[entity] = component;
-    }
-    
-    void remove(EntityID entity) {
-        components.erase(entity);
-    }
-    
-    T& get(EntityID entity) {
-        return components[entity];
-    }
-    
-    bool has(EntityID entity) const {
-        return components.find(entity) != components.end();
-    }
-};
-
-struct Transform : Component {
-    Vec3f position;
-    Vec3f rotation;
-    Vec3f scale;
-    
-    Transform() : position(0,0,0), rotation(0,0,0), scale(1,1,1) {}
-};
-
-struct Velocity : Component {
-    Vec3f linear;
-    Vec3f angular;
-};
-
-struct Renderable : Component {
-    string modelPath;
-    string texturePath;
-    bool visible;
-};
-
-// ========== SHADER SYSTEM ==========
-
-class Shader {
-private:
-    string vertexSource;
-    string fragmentSource;
-    uint32_t programID;
-    
-public:
-    Shader(const string& vs, const string& fs)
-        : vertexSource(vs), fragmentSource(fs), programID(0) {}
-    
-    bool compile() {
-        // Vertex shader compilation
-        // Fragment shader compilation
-        // Link program
-        return true;
-    }
-    
-    void bind() {
-        // glUseProgram(programID);
-    }
-    
-    void setUniform(const string& name, float value) {
-        // glUniform1f(location, value);
-    }
-};
-
-// ========== TEXTURE SYSTEM ==========
-
-class Texture {
-private:
-    int width, height, channels;
-    unsigned char* data;
-    uint32_t textureID;
-    
-public:
-    Texture(const string& path) {
-        // Load image using stb_image
-        // Generate OpenGL texture
-    }
-    
-    ~Texture() {
-        if (data) delete[] data;
-    }
-    
-    void bind(uint32_t slot = 0) {
-        // glActiveTexture(GL_TEXTURE0 + slot);
-        // glBindTexture(GL_TEXTURE_2D, textureID);
-    }
-};
-
-// ========== MESH SYSTEM ==========
-
-class Mesh {
-private:
-    vector<Vec3f> vertices;
-    vector<uint32_t> indices;
-    vector<Vec3f> normals;
-    vector<Vec2f> uvs;
-    uint32_t vao, vbo, ebo;
-    
-public:
-    Mesh(const vector<Vec3f>& verts, const vector<uint32_t>& inds)
-        : vertices(verts), indices(inds) {
-        upload();
-    }
-    
-    void upload() {
-        // Generate buffers
-        // Upload to GPU
-    }
-    
-    void draw() {
-        // glDrawElements
-    }
-};
-
-// ========== GAME ENGINE CORE ==========
-
-class GameEngine {
+class Application {
 private:
     bool running;
-    float deltaTime;
+    float delta;
     chrono::steady_clock::time_point lastFrame;
-    unique_ptr<MemoryPool> memoryPool;
-    unordered_map<EntityID, unique_ptr<ComponentManager<Component>>> componentManagers;
-    vector<EntityID> entities;
-    EntityID nextEntityID;
+    unique_ptr<MemoryArena> memory;
     
 public:
-    GameEngine() : running(false), deltaTime(0), nextEntityID(0) {
-        memoryPool = make_unique<MemoryPool>();
-        cout << "[Engine] Initialized" << endl;
+    Application() : running(false), delta(0) {
+        memory = make_unique<MemoryArena>();
+        cout << "[system] initialized" << endl;
     }
     
-    ~GameEngine() {
-        shutdown();
-    }
-    
-    bool initialize() {
+    bool init() {
         running = true;
         lastFrame = chrono::steady_clock::now();
         return true;
     }
     
-    void shutdown() {
-        running = false;
-    }
-    
-    EntityID createEntity() {
-        EntityID id = nextEntityID++;
-        entities.push_back(id);
-        return id;
-    }
-    
-    void destroyEntity(EntityID entity) {
-        auto it = find(entities.begin(), entities.end(), entity);
-        if (it != entities.end()) {
-            entities.erase(it);
-        }
-    }
-    
     void update() {
         auto now = chrono::steady_clock::now();
-        deltaTime = chrono::duration<float>(now - lastFrame).count();
+        delta = chrono::duration<float>(now - lastFrame).count();
         lastFrame = now;
-        
-        // Update all entities
-        for (auto entity : entities) {
-            // Process components
-        }
     }
     
     void render() {
-        // Render all renderable entities
+        // render logic
     }
     
     void run() {
-        if (!initialize()) return;
-        
+        if (!init()) return;
         while (running) {
             update();
             render();
-            this_thread::sleep_for(chrono::milliseconds(16)); // 60 FPS
+            this_thread::sleep_for(chrono::milliseconds(16));
         }
-        
-        shutdown();
     }
-    
-    float getDeltaTime() const { return deltaTime; }
 };
 
-} // namespace GameEngine
-
-// ========== MAIN ENTRY POINT ==========
+} // namespace engine
 
 int main() {
-    cout << "Starting Game Engine..." << endl;
-    
-    auto engine = make_unique<GameEngine::GameEngine>();
-    engine->run();
-    
+    auto app = make_unique<engine::Application>();
+    app->run();
     return 0;
 }`;
 
     let currentIndex = 0;
     let displayText = "";
-    
+    const maxChars = fullCode.length;
+
     const codeDisplay = document.getElementById("codeDisplay");
     const lineNumbersDiv = document.getElementById("lineNumbers");
-    const progressText = document.getElementById("progressText");
-    const maxChars = fullCode.length;
-    
-    function updateDisplay() {
-        // Экранируем HTML
+    const charCountSpan = document.getElementById("charCount");
+    const lineCountSpan = document.getElementById("lineCount");
+    const progressPercentSpan = document.getElementById("progressPercent");
+    const progressFill = document.getElementById("progressFill");
+
+    function updateUI() {
+        // Отображаем код
         let escaped = displayText.replace(/&/g, '&amp;')
                                  .replace(/</g, '&lt;')
-                                 .replace(/>/g, '&gt;');
-        
-        // Сохраняем пробелы
-        escaped = escaped.replace(/ /g, '&nbsp;');
-        
+                                 .replace(/>/g, '&gt;')
+                                 .replace(/ /g, '&nbsp;');
         codeDisplay.innerHTML = escaped;
         
-        // Обновляем номера строк
+        // Номера строк
         const lines = displayText.split('\n');
         const lineCount = lines.length;
-        let lineNumbersHtml = "";
+        let lineHtml = "";
         for (let i = 1; i <= Math.max(lineCount, 25); i++) {
-            lineNumbersHtml += i + "<br>";
+            lineHtml += i + "<br>";
         }
-        lineNumbersDiv.innerHTML = lineNumbersHtml;
+        lineNumbersDiv.innerHTML = lineHtml;
         
-        // Обновляем прогресс
+        // Статистика
+        charCountSpan.innerText = currentIndex;
+        lineCountSpan.innerText = lineCount;
         const percent = Math.floor((currentIndex / maxChars) * 100);
-        progressText.innerText = percent + "%";
+        progressPercentSpan.innerText = percent + "%";
+        progressFill.style.width = percent + "%";
         
-        // Автопрокрутка
-        const container = document.querySelector(".code-container");
+        // Скролл вниз
+        const container = document.querySelector(".code-area");
         container.scrollTop = container.scrollHeight;
     }
-    
-    function addCharacter() {
+
+    function addChar() {
         if (currentIndex < maxChars) {
             displayText += fullCode[currentIndex];
             currentIndex++;
-            updateDisplay();
-            
+            updateUI();
             if (currentIndex >= maxChars) {
                 document.removeEventListener("keydown", onKeyPress);
             }
         }
     }
-    
+
     function onKeyPress(e) {
-        // Игнорируем модификаторы
-        if (e.key === "Control" || e.key === "Alt" || e.key === "Shift" || 
-            e.key === "Meta" || e.key === "Escape" || e.key === "Tab" ||
-            e.key === "CapsLock" || e.key === "NumLock" || e.key === "ScrollLock" ||
-            e.key === "Pause" || e.key === "Insert" || e.key === "Home" ||
-            e.key === "PageUp" || e.key === "Delete" || e.key === "End" ||
-            e.key === "PageDown")) {
-            return;
-        }
-        
-        addCharacter();
+        // Игнорируем служебные клавиши
+        const ignore = ["Control", "Alt", "Shift", "Meta", "Escape", "Tab", 
+                       "CapsLock", "NumLock", "ScrollLock", "Pause", "Insert",
+                       "Home", "PageUp", "Delete", "End", "PageDown"];
+        if (ignore.includes(e.key)) return;
+        addChar();
     }
-    
+
     function resetCode() {
         displayText = "";
         currentIndex = 0;
-        updateDisplay();
+        updateUI();
         document.addEventListener("keydown", onKeyPress);
     }
-    
-    // Запуск
-    updateDisplay();
+
+    updateUI();
     document.addEventListener("keydown", onKeyPress);
 </script>
 </body>
